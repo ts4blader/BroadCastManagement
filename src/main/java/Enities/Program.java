@@ -7,7 +7,7 @@ public class Program {
     private String producerID;
 
 
-    private static int cout = 10;
+    private static int cout = 0;
 
     public Program(String id, String name, String categoryID, String producerID) {
         this.id = id;

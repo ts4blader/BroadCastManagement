@@ -20,6 +20,19 @@
     -fx-pref-height: 5;
 }
 /*
+Table Cell
+*/
+.table-cell{
+    -fx-alignment: CENTER-RIGHT;
+    -fx-font-size: 14;
+}
+/*
+Table Header
+*/
+.table-view .column-header .label{
+    -fx-font-size: 16;
+}
+/*
 =================
 Tab
 =================

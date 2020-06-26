@@ -47,12 +47,10 @@ public class InputField extends VBox {
 
         //================id Field=====================
         idField = new JFXTextField();
-        idField.setDisable(true);
         idField.setPrefHeight(30);
         idField.setFont(new Font(16));
         idField.setPromptText("ID");
         idField.setLabelFloat(true);
-        idField.setText("#32");
 
         //================ end ====================
 
@@ -79,7 +77,8 @@ public class InputField extends VBox {
 
         //==================== channel ComboBox ======================
         channelSelector = new JFXComboBox<>();
-        channelSelector.setPromptText("Select Channel");
+        channelSelector.setPromptText("Channel");
+        channelSelector.setLabelFloat(true);
         channelSelector.prefWidthProperty().bind(this.widthProperty().multiply(0.5));
         channelSelector.setItems(ChannelBLL.getAllChannel());
 
@@ -103,7 +102,8 @@ public class InputField extends VBox {
 
         //================= category ComboBox ===================
         categorySelector = new JFXComboBox<>();
-        categorySelector.setPromptText("Select Category");
+        categorySelector.setPromptText("Category");
+        categorySelector.setLabelFloat(true);
         categorySelector.prefWidthProperty().bind(this.widthProperty().multiply(0.5));
         //set list for category selector
         ObservableList<Category> categories = CategoryBLL.getAllCategory();
@@ -132,7 +132,8 @@ public class InputField extends VBox {
         producerSelector = new JFXComboBox<>();
         producerSelector.prefWidthProperty().bind(this.widthProperty().multiply(0.5));
         producerSelector.setItems(ProducerBLL.getAllProducer());
-        producerSelector.setPromptText("Select Producer");
+        producerSelector.setPromptText("Producer");
+        producerSelector.setLabelFloat(true);
 
         producerName = new JFXTextField();
         producerName.prefWidthProperty().bind(this.widthProperty().multiply(0.5));
@@ -157,8 +158,11 @@ public class InputField extends VBox {
                 validatorProgram();
             });
 
-
             clearBtn = new JFXButton("Clear");
+            clearBtn.setOnAction( e ->{
+                clearInput();
+            });
+
             searchBtn = new JFXButton("Search");
 
             //add to Button Bar
@@ -172,9 +176,8 @@ public class InputField extends VBox {
         //================ main layout =============
 
 
-
         this.setPadding(new Insets(30));
-        this.setSpacing(35);
+        this.setSpacing(40);
         this.setAlignment(Pos.CENTER);
         this.getChildren().addAll(idField, nameField, channelField, categoryField, producerField, buttonBar);
 
@@ -185,7 +188,7 @@ public class InputField extends VBox {
 
     public void validatorProgram(){
         if( nameField.getText().equals("")) {
-            MyDialog.showDialog("Input requirement", null, "Name not empty", MyDialog.ERRO);
+            MyDialog.showDialog("Input requirement", null, "Name not match Requirement", MyDialog.ERRO);
             return ;
         }
         if( channelSelector.getValue() == null) {
@@ -200,17 +203,41 @@ public class InputField extends VBox {
             return;
         }    }
 
+    public boolean addProgram(){
+        try {
+            validatorProgram();
 
-    public void addProgram(){
-        validatorProgram();
+            String id = (idField.getText());
+            String name = nameField.getText();
+            String categoryID = categorySelector.getValue().getId();
+            String channelID = channelSelector.getValue().getId();
+            String producerID = producerSelector.getValue().getId();
 
-        String id = (idField.getText());
-        String name = nameField.getText();
-        String categoryID = categorySelector.getValue().getId();
-        String channelID = channelSelector.getValue().getId();
-        String producerID = producerSelector.getValue().getId();
+            ProgramBLL.add(new Program(id, name, categoryID, producerID));
+            return true;
 
-        ProgramBLL.add(new Program(id, name, categoryID, producerID));
+        } catch (Exception e){
+            MyDialog.showDialog("Can not Add Program", "Unknow Error",e.getMessage(), MyDialog.ERRO);
+        } finally {
+            return false;
+        }
+
+    }
+
+    public boolean clearInput(){
+        try{
+            idField.setText("");
+            nameField.setText("");
+            channelSelector.setValue(null);
+            categorySelector.setValue(null);
+            producerSelector.setValue(null);
+
+            return true;
+        } catch (Exception e){
+            MyDialog.showDialog("Clear Input", "Clear Error",e.getMessage(),MyDialog.ERRO);
+        } finally {
+            return false;
+        }
     }
     //====================== End =================================
 }
