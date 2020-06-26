@@ -56,3 +56,12 @@ Tab
 .button{
     -fx-font-size: 14;
 }
+
+/*
+Top Pane
+*/
+.topPane{
+    -fx-padding: 20 40;
+    -fx-background-color: mainColor;
+    -fx-text-fill: white;
+}

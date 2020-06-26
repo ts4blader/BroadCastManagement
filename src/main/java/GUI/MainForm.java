@@ -56,7 +56,7 @@ public class MainForm extends Application {
 
         //primary Stage
 
-        primaryStage.setTitle("BroadCast Management");
+        primaryStage.setTitle("Input Window");
         primaryStage.setMinWidth(800);
         primaryStage.setMinHeight(600);
         primaryStage.setScene(scene);
