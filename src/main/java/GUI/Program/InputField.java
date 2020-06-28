@@ -14,12 +14,22 @@ import com.jfoenix.validation.RequiredFieldValidator;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 
-public class InputField extends VBox {
+import java.io.File;
+import java.net.MalformedURLException;
 
+public class InputField extends VBox {
+    // Define const
+    public final static int ICON_SIZE = 15;
+
+
+    //Define var
     private JFXTextField idField;
 
     private JFXTextField nameField;
@@ -42,133 +52,81 @@ public class InputField extends VBox {
     private JFXButton clearBtn;
     private JFXButton searchBtn;
 
-
-    public InputField(){
-
-        //================id Field=====================
-        idField = new JFXTextField();
-        idField.setPrefHeight(30);
-        idField.setFont(new Font(16));
-        idField.setPromptText("ID");
-        idField.setLabelFloat(true);
-
-        //================ end ====================
+    private File addImage = new File("src/main/resources/icons/plus.png");
+    private File clearImage = new File("src/main/resources/icons/clean.png");
+    private File searchImage = new File("src/main/resources/icons/search.png");
 
 
-        //================== name Field =================
-        nameField = new JFXTextField();
-        nameField.setFont(new Font(16));
-        nameField.setPrefHeight(30);
-        nameField.setLabelFloat(true);
-        nameField.setPromptText("Name");
+    public InputField() throws Exception{
 
-        //====================== end =========================
+        idField = getTextField("ID");
+        setValidator(idField,"Not match Requirement");
 
-        //=====================name validator=======================
-        RequiredFieldValidator validator = new RequiredFieldValidator();
-        validator.setMessage("Require");
-        nameField.setValidators(validator);
-        nameField.focusedProperty().addListener( (o ,oldVla, newVal) -> {
-            if(!newVal)
-                nameField.validate();
-        });
+        nameField = getTextField("Name");
+        setValidator(nameField, "Not match Requirement");
 
-        //==================== end ======================
 
-        //==================== channel ComboBox ======================
-        channelSelector = new JFXComboBox<>();
-        channelSelector.setPromptText("Channel");
-        channelSelector.setLabelFloat(true);
-        channelSelector.prefWidthProperty().bind(this.widthProperty().multiply(0.5));
-        channelSelector.setItems(ChannelBLL.getAllChannel());
+        //====================== Channel Field ======================
 
-        //==================== Channel Name TextField ==========================
-        channelName = new JFXTextField();
+        channelSelector = getChannelSelector();
+
+        channelName = getTextField("Channel ID");
         channelName.prefWidthProperty().bind(this.widthProperty().multiply(0.5));
-        channelName.setPromptText("Channel ID");
         channelName.setDisable(true);
-        channelName.setLabelFloat(true);
 
-        //add to channel Field
         channelField = new HBox(15);
         channelField.getChildren().addAll(channelSelector, channelName);
 
-        //event handler
-        channelSelector.setOnAction( (e) -> {
-            channelName.setText(channelSelector.getValue().getId());
-        });
 
-        //===================== end ===========================
+        //================= Category Field ===================
+        categorySelector = getCategorySelector();
 
-        //================= category ComboBox ===================
-        categorySelector = new JFXComboBox<>();
-        categorySelector.setPromptText("Category");
-        categorySelector.setLabelFloat(true);
-        categorySelector.prefWidthProperty().bind(this.widthProperty().multiply(0.5));
-        //set list for category selector
-        ObservableList<Category> categories = CategoryBLL.getAllCategory();
-        categorySelector.setItems(categories);
-
-        //event handler
-        categorySelector.setOnAction( (e) -> {
-            categoryName.setText(categorySelector.getValue().getId());
-        });
-
-
-        //add Category Name Textfield
-        categoryName = new JFXTextField();
-        categoryName.setLabelFloat(true);
+        categoryName = getTextField("Category ID");
         categoryName.setDisable(true);
-        categoryName.setPromptText("Category ID");
         categoryName.prefWidthProperty().bind(this.widthProperty().multiply(0.5));
-        //add to category Field
+
         categoryField = new HBox(15);
         categoryField.getChildren().addAll(categorySelector, categoryName);
 
-        //================ end ============
 
-        //============== Producer ==================
+        //============== Producer Field ==================
 
-        producerSelector = new JFXComboBox<>();
-        producerSelector.prefWidthProperty().bind(this.widthProperty().multiply(0.5));
-        producerSelector.setItems(ProducerBLL.getAllProducer());
-        producerSelector.setPromptText("Producer");
-        producerSelector.setLabelFloat(true);
+        producerSelector = getProducerSelector();
 
-        producerName = new JFXTextField();
-        producerName.prefWidthProperty().bind(this.widthProperty().multiply(0.5));
-        producerName.setPromptText("Producer ID");
-        producerName.setLabelFloat(true);
+        producerName = getTextField("Producer ID");
         producerName.setDisable(true);
-
-        producerSelector.setOnAction( e ->{
-            producerName.setText(producerSelector.getValue().getId());
-        });
-        //add to produceField
+        producerName.prefWidthProperty().bind(this.widthProperty().multiply(0.5));
 
         producerField = new HBox(15);
         producerField.getChildren().addAll(producerSelector, producerName);
 
-        //============== end =====================
-
         //====================== Button Bar ======================
 
-            addBtn = new JFXButton("Add");
-            addBtn.setOnAction(e -> {
-                validatorProgram();
-            });
 
-            clearBtn = new JFXButton("Clear");
-            clearBtn.setOnAction( e ->{
-                clearInput();
-            });
+        addBtn = new JFXButton("Add");
+        ImageView addImageView = getImageView(addImage, ICON_SIZE);
+        addBtn.setGraphic(addImageView);
 
-            searchBtn = new JFXButton("Search");
+        addBtn.setOnAction(e -> {
+            validatorProgram();
+        });
 
-            //add to Button Bar
-            buttonBar = new HBox(15);
-            buttonBar.setAlignment(Pos.CENTER);
-            buttonBar.getChildren().addAll(addBtn, clearBtn, searchBtn);
+        clearBtn = new JFXButton("Clear");
+        clearBtn.setOnAction( e ->{
+            clearInput();
+        });
+
+        ImageView clearImageView = getImageView(clearImage, ICON_SIZE);
+        clearBtn.setGraphic(clearImageView);
+
+        searchBtn = new JFXButton("Search");
+        ImageView searchImageView = getImageView(searchImage, ICON_SIZE);
+        searchBtn.setGraphic(searchImageView);
+
+        //add to Button Bar
+        buttonBar = new HBox(15);
+        buttonBar.setAlignment(Pos.CENTER);
+        buttonBar.getChildren().addAll(addBtn, clearBtn, searchBtn);
 
         //====================== End ======================
 
@@ -186,6 +144,76 @@ public class InputField extends VBox {
 
     //====================== Controller Section ======================
 
+    public JFXTextField getTextField(String promtText){
+
+        JFXTextField textField;
+
+        textField = new JFXTextField();
+        textField.setPrefHeight(30);
+        textField.setFont(new Font(16));
+        textField.setPromptText(promtText);
+        textField.setLabelFloat(true);
+
+        textField.setOnAction( e -> addProgram());
+
+        return textField;
+    }
+
+    public JFXComboBox<Channel> getChannelSelector(){
+
+        JFXComboBox<Channel> comboBox;
+
+        comboBox = new JFXComboBox<>();
+        comboBox.setPromptText("Channel");
+        comboBox.setLabelFloat(true);
+        comboBox.prefWidthProperty().bind(this.widthProperty().multiply(0.5));
+        comboBox.setItems(ChannelBLL.getAllChannel());
+
+        comboBox.setOnAction( e -> channelName.setText(comboBox.getValue().getId()));
+
+        return comboBox;
+    }
+
+    public JFXComboBox<Category> getCategorySelector(){
+
+        JFXComboBox<Category> comboBox;
+
+        comboBox = new JFXComboBox<>();
+        comboBox.setPromptText("Category");
+        comboBox.setLabelFloat(true);
+        comboBox.prefWidthProperty().bind(this.widthProperty().multiply(0.5));
+        comboBox.setItems(CategoryBLL.getAllCategory());
+
+        comboBox.setOnAction( e -> categoryName.setText(comboBox.getValue().getId()));
+
+        return comboBox;
+    }
+
+    public JFXComboBox<Producer> getProducerSelector(){
+
+        JFXComboBox<Producer> comboBox;
+
+        comboBox = new JFXComboBox<>();
+        comboBox.setPromptText("Producer");
+        comboBox.setLabelFloat(true);
+        comboBox.prefWidthProperty().bind(this.widthProperty().multiply(0.5));
+        comboBox.setItems(ProducerBLL.getAllProducer());
+
+        comboBox.setOnAction( e -> producerName.setText(comboBox.getValue().getId()));
+
+        return comboBox;
+    }
+
+    public void setValidator(JFXTextField textField, String message){
+        RequiredFieldValidator validator = new RequiredFieldValidator();
+        validator.setMessage(message);
+        textField.setValidators(validator);
+        textField.focusedProperty().addListener( (o ,oldVla, newVal) -> {
+            if(!newVal)
+                textField.validate();
+        });
+    }
+
     public void validatorProgram(){
         if( nameField.getText().equals("")) {
             MyDialog.showDialog("Input requirement", null, "Name not match Requirement", MyDialog.ERRO);
@@ -201,7 +229,24 @@ public class InputField extends VBox {
         }        if( producerSelector.getValue() == null) {
             MyDialog.showDialog("Input requirement", null, "Producer not null", MyDialog.ERRO);
             return;
-        }    }
+        }
+    }
+
+    public ImageView getImageView(File image, int iconSize){
+
+        ImageView imageView = null;
+        try {
+            imageView = new ImageView(new Image(image.toURI().toURL().toString()));
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+
+        imageView.setFitHeight(iconSize);
+        imageView.setFitWidth(iconSize);
+
+        return imageView;
+
+    }
 
     public boolean addProgram(){
         try {

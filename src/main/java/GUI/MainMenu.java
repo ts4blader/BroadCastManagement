@@ -154,7 +154,7 @@ public class MainMenu extends Application {
         File css = new File("src/main/java/GUI/style.css");
         scene.getStylesheets().add("file:///" + css.getAbsolutePath().replace("\\", "/"));
         primaryStage.setScene(scene);
-        primaryStage.setResizable(true);
+        primaryStage.setResizable(false);
         primaryStage.show();
     }
 }
