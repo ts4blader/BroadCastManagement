@@ -8,7 +8,9 @@ import Enities.Category;
 import Enities.Channel;
 import Enities.Producer;
 import Enities.Program;
+import Utilities.ImageGetter;
 import Utilities.MyDialog;
+import Utilities.MyLayout;
 import com.jfoenix.controls.*;
 import com.jfoenix.validation.RequiredFieldValidator;
 import javafx.collections.ObservableList;
@@ -17,6 +19,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
@@ -26,7 +29,6 @@ import java.net.MalformedURLException;
 
 public class InputField extends VBox {
     // Define const
-    public final static int ICON_SIZE = 15;
 
 
     //Define var
@@ -52,9 +54,6 @@ public class InputField extends VBox {
     private JFXButton clearBtn;
     private JFXButton searchBtn;
 
-    private File addImage = new File("src/main/resources/icons/plus.png");
-    private File clearImage = new File("src/main/resources/icons/clean.png");
-    private File searchImage = new File("src/main/resources/icons/search.png");
 
 
     public InputField() throws Exception{
@@ -106,12 +105,12 @@ public class InputField extends VBox {
         HBox hBox;
 
         channelSelector = getChannelSelector();
-
+        channelSelector.setPrefHeight(MyLayout.INPUT_HEIGHT);
         channelName = getTextField("Channel ID");
         channelName.prefWidthProperty().bind(this.widthProperty().multiply(0.5));
         channelName.setDisable(true);
 
-        hBox = new HBox(15);
+        hBox = new HBox(10);
         hBox.getChildren().addAll(channelSelector, channelName);
 
         return hBox;
@@ -122,6 +121,7 @@ public class InputField extends VBox {
         HBox hBox;
 
         categorySelector = getCategorySelector();
+        categorySelector.setPrefHeight(MyLayout.INPUT_HEIGHT);
 
         categoryName = getTextField("Category ID");
         categoryName.setDisable(true);
@@ -138,6 +138,7 @@ public class InputField extends VBox {
         HBox hBox;
 
         producerSelector = getProducerSelector();
+        producerSelector.setPrefHeight(MyLayout.INPUT_HEIGHT);
 
         producerName = getTextField("Producer ID");
         producerName.setDisable(true);
@@ -154,13 +155,13 @@ public class InputField extends VBox {
 
         HBox hBox;
 
-        addBtn = getButton("Add", addImage, ICON_SIZE);
+        addBtn = getButton("Add", ImageGetter.ADD, MyLayout.ICON_SIZE);
         addBtn.setOnAction(e -> addProgram());
 
-        clearBtn = getButton("Clear", clearImage, ICON_SIZE);
+        clearBtn = getButton("Clear", ImageGetter.CLEAR, MyLayout.ICON_SIZE);
         clearBtn.setOnAction(e -> clearInput());
 
-        searchBtn = getButton("Search",searchImage, ICON_SIZE);
+        searchBtn = getButton("Search",ImageGetter.SEARCH, MyLayout.ICON_SIZE);
 
 
         //add to Button Bar
@@ -179,7 +180,7 @@ public class InputField extends VBox {
 
         textField = new JFXTextField();
         textField.setPrefHeight(30);
-        textField.setFont(new Font(16));
+        textField.setFont(new Font(MyLayout.FONT_SIZE));
         textField.setPromptText(promtText);
         textField.setLabelFloat(true);
 
@@ -199,6 +200,10 @@ public class InputField extends VBox {
         comboBox.setItems(ChannelBLL.getAllChannel());
 
         comboBox.setOnAction( e -> channelName.setText(comboBox.getValue().getId()));
+        comboBox.setOnKeyPressed( e ->{
+            if(e.getCode() == KeyCode.ENTER)
+                addProgram();
+        });
 
         return comboBox;
     }
@@ -214,6 +219,10 @@ public class InputField extends VBox {
         comboBox.setItems(CategoryBLL.getAllCategory());
 
         comboBox.setOnAction( e -> categoryName.setText(comboBox.getValue().getId()));
+        comboBox.setOnKeyPressed( e ->{
+            if(e.getCode() == KeyCode.ENTER)
+                addProgram();
+        });
 
         return comboBox;
     }
@@ -229,6 +238,10 @@ public class InputField extends VBox {
         comboBox.setItems(ProducerBLL.getAllProducer());
 
         comboBox.setOnAction( e -> producerName.setText(comboBox.getValue().getId()));
+        comboBox.setOnKeyPressed( e ->{
+            if(e.getCode() == KeyCode.ENTER)
+                addProgram();
+        });
 
         return comboBox;
     }
@@ -236,7 +249,7 @@ public class InputField extends VBox {
     public JFXButton getButton(String Label, File image, int iconSize){
 
         JFXButton button = new JFXButton(Label);
-        ImageView imageView = getImageView(image, iconSize);
+        ImageView imageView = ImageGetter.getImageView(image, iconSize);
         button.setGraphic(imageView);
 
         return button;
@@ -252,43 +265,29 @@ public class InputField extends VBox {
         });
     }
 
-    public void validatorProgram(){
+    public boolean validatorProgram(){
         if( nameField.getText().equals("")) {
             MyDialog.showDialog("Input requirement", null, "Name not match Requirement", MyDialog.ERRO);
-            return ;
+            return false;
         }
         if( channelSelector.getValue() == null) {
             MyDialog.showDialog("Input requirement", null, "Channel not null", MyDialog.ERRO);
-            return;
+            return false;
         }
         if( categorySelector.getValue() == null) {
             MyDialog.showDialog("Input requirement", null, "Category not null", MyDialog.ERRO);
-            return;
+            return false;
         }        if( producerSelector.getValue() == null) {
             MyDialog.showDialog("Input requirement", null, "Producer not null", MyDialog.ERRO);
-            return;
-        }
-    }
-
-    public ImageView getImageView(File image, int iconSize){
-
-        ImageView imageView = null;
-        try {
-            imageView = new ImageView(new Image(image.toURI().toURL().toString()));
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
+            return false;
         }
 
-        imageView.setFitHeight(iconSize);
-        imageView.setFitWidth(iconSize);
-
-        return imageView;
-
+        return true;
     }
 
     public boolean addProgram(){
         try {
-            validatorProgram();
+            if(!validatorProgram()) return false;
 
             String id = (idField.getText());
             String name = nameField.getText();

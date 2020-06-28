@@ -7,6 +7,8 @@ import Enities.Category;
 import Enities.Nation;
 import Enities.Producer;
 import Enities.Program;
+import Utilities.ImageGetter;
+import Utilities.MyLayout;
 import com.jfoenix.controls.JFXButton;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
@@ -16,55 +18,88 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.util.Callback;
 import javafx.util.StringConverter;
 
+import java.io.File;
+
 public class DataTable extends VBox {
-    //============TableView
-    private TableView<Program> tableView = new TableView<>();
-    //============ID Col
-    private TableColumn<Program, Integer> idCol = new TableColumn<>("#");
-    //=============Name Col
-    private TableColumn<Program, String> nameCol = new TableColumn<>("Name");
-    //============Category Col
-    private TableColumn<Program, Category> categoryCol = new TableColumn<>("Category");
-    //============Producer Col
-    private TableColumn<Program, Producer> producerCol = new TableColumn<>("Producer");
-    //============Nation Col
-    private TableColumn<Program, Nation> nationCol = new TableColumn<>("Nation");
-    //=========== Button Bar
+
+    public final static int ICON_SIZE = 15;
+
+    //TableView
+    private TableView<Program> tableView;
+    //ID Col
+    private TableColumn<Program, String> idCol;
+    //Name Col
+    private TableColumn<Program, String> nameCol;
+    //Category Col
+    private TableColumn<Program, Category> categoryCol;
+    //Producer Col
+    private TableColumn<Program, Producer> producerCol;
+    //Nation Col
+    private TableColumn<Program, Nation> nationCol;
+    //Button Bar
     private HBox buttonBar;
-    //=========== Buttons
+    //Buttons
     private Button saveBtn;
     private Button undoBtn;
     private Button redoBtn;
     private Button deleteBtn;
     private Button deleteAllBtn;
 
+
     public DataTable(){
-        //set editable
-        tableView.setEditable(true);
-        //=======================
-        //ID Col
-        //========================
-        idCol.setCellValueFactory(new PropertyValueFactory<>("id"));
+
+        //====================== ID Col ======================
+
+        idCol = getTextCol("#","id");
         idCol.setStyle("-fx-alignment: CENTER-RIGHT");
-        //==========================
-        // Name Col <TextField>
-        //========================
-        nameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
 
-        nameCol.setCellFactory(TextFieldTableCell.<Program>forTableColumn());
+        //====================== Name Col ======================
 
-        nameCol.setMinWidth(150);
+        nameCol = getTextCol("Name", "name");
+
+        //====================== Category Col ======================
+
+        categoryCol = getCategoryCol();
+
+        //====================== Producer Col ======================
+
+        producerCol = getProducerCol();
+
+        //====================== Button Bar ======================
+
+        buttonBar = getButtonBar();
+
+        //===================== tableView =======================
+
+        tableView = getTableView();
+
+
+        //======================== Main Layout =============================
+
+        getMainLayout();
+
+    }
+
+    public TableColumn<Program, String> getTextCol(String text, String property){
+
+        TableColumn<Program, String> tableColumn;
+        tableColumn = new TableColumn<>(text);
+
+        tableColumn.setCellValueFactory(new PropertyValueFactory<>(property));
+        tableColumn.setCellFactory(TextFieldTableCell.<Program>forTableColumn());
+        tableColumn.setMinWidth(50);
 
         //Commit
-        nameCol.setOnEditCommit( (TableColumn.CellEditEvent<Program, String> e) -> {
+        tableColumn.setOnEditCommit( (TableColumn.CellEditEvent<Program, String> e) -> {
             TablePosition<Program, String> pos = e.getTablePosition();
 
-            String name = e.getNewValue();
+            String newValue = e.getNewValue();
 
             int row = pos.getRow();
             Program program = e.getTableView().getItems().get(row);
@@ -72,10 +107,15 @@ public class DataTable extends VBox {
             ProgramBLL.update(program);
         });
 
-        //======================
-        //Category Col <ComboBox>
-        //======================
-        categoryCol.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Program, Category>, ObservableValue<Category>>() {
+        return tableColumn;
+    }
+
+    public TableColumn<Program, Category> getCategoryCol(){
+
+        TableColumn<Program, Category> tableColumn;
+        tableColumn = new TableColumn<>("Category");
+
+        tableColumn.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Program, Category>, ObservableValue<Category>>() {
             @Override
             public ObservableValue<Category> call(TableColumn.CellDataFeatures<Program, Category> param) {
                 Program program = param.getValue();
@@ -87,25 +127,33 @@ public class DataTable extends VBox {
                 return new SimpleObjectProperty<Category>(category);
             }
         });
-        categoryCol.setCellFactory(ComboBoxTableCell.forTableColumn(CategoryBLL.getAllCategory()));
-
-        categoryCol.setOnEditCommit( (TableColumn.CellEditEvent<Program, Category> e) -> {
+        //set cell factory
+        tableColumn.setCellFactory(ComboBoxTableCell.forTableColumn(CategoryBLL.getAllCategory()));
+        //Commit
+        tableColumn.setOnEditCommit( (TableColumn.CellEditEvent<Program, Category> e) -> {
             TablePosition<Program, Category> pos = e.getTablePosition();
-
+            //get new value
             Category newCategory = e.getNewValue();
-
+            //get row
             int row = pos.getRow();
             Program program = e.getTableView().getItems().get(row);
 
             ProgramBLL.update(program);
         });
 
-        categoryCol.setMinWidth(100);
+        tableColumn.setMinWidth(100);
 
-        //=====================
-        //Producer Col
-        //====================
-        producerCol.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Program, Producer>, ObservableValue<Producer>>() {
+        return tableColumn;
+
+
+    }
+
+    public TableColumn<Program, Producer> getProducerCol(){
+
+        TableColumn<Program, Producer> tableColumn;
+        tableColumn = new TableColumn<>("Producer");
+
+        tableColumn.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Program, Producer>, ObservableValue<Producer>>() {
             @Override
             public ObservableValue<Producer> call(TableColumn.CellDataFeatures<Program, Producer> param) {
                 Program program = param.getValue();
@@ -118,9 +166,9 @@ public class DataTable extends VBox {
             }
         });
 
-        producerCol.setCellFactory(ComboBoxTableCell.forTableColumn(ProducerBLL.getAllProducer()));
+        tableColumn.setCellFactory(ComboBoxTableCell.forTableColumn(ProducerBLL.getAllProducer()));
 
-        producerCol.setOnEditCommit((TableColumn.CellEditEvent<Program, Producer> e) ->{
+        tableColumn.setOnEditCommit((TableColumn.CellEditEvent<Program, Producer> e) ->{
             TablePosition<Program, Producer> position = e.getTablePosition();
 
             int row = position.getRow();
@@ -130,37 +178,62 @@ public class DataTable extends VBox {
             //update Producer
         });
 
-        producerCol.setMinWidth(100);
+        tableColumn.setMinWidth(100);
 
-        //====================== Button Bar ======================
-
-        saveBtn = new Button("Save");
-        undoBtn = new Button("Undo");
-        redoBtn = new Button("Redo");
-        deleteBtn = new Button("Delete");
-        deleteAllBtn = new Button("Delete All");
-
-        buttonBar = new HBox(10);
-        buttonBar.setAlignment(Pos.CENTER);
-        buttonBar.getChildren().addAll(saveBtn, undoBtn, redoBtn, deleteBtn, deleteAllBtn);
-
-        //====================== End ======================
+        return tableColumn;
 
 
-        //===================== tableView =======================
+    }
+
+    public HBox getButtonBar(){
+
+        HBox hBox = new HBox(MyLayout.SPACE);
+
+        saveBtn = getButton("Save",ImageGetter.SAVE, MyLayout.ICON_SIZE);
+
+        redoBtn = getButton("Redo",ImageGetter.REDO, MyLayout.ICON_SIZE);
+
+        undoBtn = getButton("Undo",ImageGetter.UNDO, MyLayout.ICON_SIZE);
+
+        deleteBtn = getButton("Delete",ImageGetter.DELETE, MyLayout.ICON_SIZE);
+
+        deleteAllBtn = getButton("Delete All",ImageGetter.DELETE, MyLayout.ICON_SIZE);
+
+        hBox.setAlignment(Pos.CENTER);
+        hBox.getChildren().addAll(saveBtn, undoBtn, redoBtn, deleteBtn, deleteAllBtn);
+
+        return hBox;
+
+    }
+
+    public Button getButton(String Label, File image, int iconSize){
+
+        Button button = new Button(Label);
+        button.setGraphic(ImageGetter.getImageView(image, iconSize));
+        button.setOnAction(e -> {});
+
+        return button;
+    }
+
+    public TableView<Program> getTableView(){
+
+        TableView<Program> tableView = new TableView<>();
 
         tableView.setItems(ProgramBLL.getAllProgram());
         tableView.setMinHeight(450);
+        tableView.setEditable(true);
         tableView.prefHeightProperty().bind(this.heightProperty().divide(5.5/4.5));
         tableView.getColumns().addAll(idCol, nameCol, categoryCol, producerCol);
 
+        return tableView;
+    }
 
-        //======================== Main Layout =============================
+    public void getMainLayout(){
 
         this.setAlignment(Pos.TOP_CENTER);
         this.setSpacing(20);
         this.getChildren().addAll(tableView, buttonBar);
+
+
     }
-
-
 }

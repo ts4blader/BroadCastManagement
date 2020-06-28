@@ -24,7 +24,7 @@
 Table Cell
 */
 .table-cell{
-    -fx-alignment: CENTER-RIGHT;
+    -fx-alignment: CENTER-LEFT;
     -fx-font-size: 14;
 }
 /*
@@ -83,7 +83,6 @@ Bot Pane
     -fx-background-color: mainColor;
 }
 .botPane .label{
-    -fx-font-style: italic;
     -fx-text-fill: white;
     -fx-font-size: 14;
 }
