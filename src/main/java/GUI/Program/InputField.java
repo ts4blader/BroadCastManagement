@@ -68,28 +68,74 @@ public class InputField extends VBox {
 
         //====================== Channel Field ======================
 
+        channelField = getChannelField();
+
+
+        //================= Category Field ===================
+
+        categoryField = getCategoryField();
+
+
+        //============== Producer Field ==================
+
+        producerField = getProducerField();
+
+        //====================== Button Bar ======================
+
+        buttonBar = getButtonBar();
+
+        //================ main layout =============
+
+        getMainLayout();
+
+    }
+
+    //====================== Controller Section ======================
+
+    public void getMainLayout(){
+
+        this.setPadding(new Insets(30));
+        this.setSpacing(40);
+        this.setAlignment(Pos.CENTER);
+        this.getChildren().addAll(idField, nameField, channelField, categoryField, producerField, buttonBar);
+
+    }
+
+    public HBox getChannelField(){
+
+        HBox hBox;
+
         channelSelector = getChannelSelector();
 
         channelName = getTextField("Channel ID");
         channelName.prefWidthProperty().bind(this.widthProperty().multiply(0.5));
         channelName.setDisable(true);
 
-        channelField = new HBox(15);
-        channelField.getChildren().addAll(channelSelector, channelName);
+        hBox = new HBox(15);
+        hBox.getChildren().addAll(channelSelector, channelName);
 
+        return hBox;
+    }
 
-        //================= Category Field ===================
+    public HBox getCategoryField(){
+
+        HBox hBox;
+
         categorySelector = getCategorySelector();
 
         categoryName = getTextField("Category ID");
         categoryName.setDisable(true);
         categoryName.prefWidthProperty().bind(this.widthProperty().multiply(0.5));
 
-        categoryField = new HBox(15);
-        categoryField.getChildren().addAll(categorySelector, categoryName);
+        hBox = new HBox(15);
+        hBox.getChildren().addAll(categorySelector, categoryName);
 
+        return hBox;
+    }
 
-        //============== Producer Field ==================
+    public HBox getProducerField(){
+
+        HBox hBox;
 
         producerSelector = getProducerSelector();
 
@@ -97,52 +143,35 @@ public class InputField extends VBox {
         producerName.setDisable(true);
         producerName.prefWidthProperty().bind(this.widthProperty().multiply(0.5));
 
-        producerField = new HBox(15);
-        producerField.getChildren().addAll(producerSelector, producerName);
+        hBox = new HBox(15);
+        hBox.getChildren().addAll(producerSelector, producerName);
 
-        //====================== Button Bar ======================
-
-
-        addBtn = new JFXButton("Add");
-        ImageView addImageView = getImageView(addImage, ICON_SIZE);
-        addBtn.setGraphic(addImageView);
-
-        addBtn.setOnAction(e -> {
-            validatorProgram();
-        });
-
-        clearBtn = new JFXButton("Clear");
-        clearBtn.setOnAction( e ->{
-            clearInput();
-        });
-
-        ImageView clearImageView = getImageView(clearImage, ICON_SIZE);
-        clearBtn.setGraphic(clearImageView);
-
-        searchBtn = new JFXButton("Search");
-        ImageView searchImageView = getImageView(searchImage, ICON_SIZE);
-        searchBtn.setGraphic(searchImageView);
-
-        //add to Button Bar
-        buttonBar = new HBox(15);
-        buttonBar.setAlignment(Pos.CENTER);
-        buttonBar.getChildren().addAll(addBtn, clearBtn, searchBtn);
-
-        //====================== End ======================
-
-
-        //================ main layout =============
-
-
-        this.setPadding(new Insets(30));
-        this.setSpacing(40);
-        this.setAlignment(Pos.CENTER);
-        this.getChildren().addAll(idField, nameField, channelField, categoryField, producerField, buttonBar);
-
+        return hBox;
 
     }
 
-    //====================== Controller Section ======================
+    public HBox getButtonBar(){
+
+        HBox hBox;
+
+        addBtn = getButton("Add", addImage, ICON_SIZE);
+        addBtn.setOnAction(e -> addProgram());
+
+        clearBtn = getButton("Clear", clearImage, ICON_SIZE);
+        clearBtn.setOnAction(e -> clearInput());
+
+        searchBtn = getButton("Search",searchImage, ICON_SIZE);
+
+
+        //add to Button Bar
+        hBox = new HBox(15);
+        hBox.setAlignment(Pos.CENTER);
+        hBox.getChildren().addAll(addBtn, clearBtn, searchBtn);
+
+
+        return hBox;
+
+    }
 
     public JFXTextField getTextField(String promtText){
 
@@ -202,6 +231,15 @@ public class InputField extends VBox {
         comboBox.setOnAction( e -> producerName.setText(comboBox.getValue().getId()));
 
         return comboBox;
+    }
+
+    public JFXButton getButton(String Label, File image, int iconSize){
+
+        JFXButton button = new JFXButton(Label);
+        ImageView imageView = getImageView(image, iconSize);
+        button.setGraphic(imageView);
+
+        return button;
     }
 
     public void setValidator(JFXTextField textField, String message){
