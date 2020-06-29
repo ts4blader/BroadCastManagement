@@ -16,7 +16,8 @@ import utilities.MyLayout;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 public class InputField extends VBox {
     // Define const
@@ -163,11 +164,9 @@ public class InputField extends VBox {
             String name = nameField.getText().trim();
             Boolean isCenter = isCenterBox.isSelected();
             String beginDateString = beginDateField.getText();
-            Date beginDate;
+            LocalDate beginDate = LocalDate.parse(beginDateField.getText().trim(), DateTimeFormatter.ofPattern("dd/MM/yyyy"));
             String city = cityField.getText();
             //Convert to date
-            DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-            beginDate = dateFormat.parse(beginDateString);
 
             ChannelBLL.add(new Channel(id, name, isCenter, beginDate, city));
             return true;

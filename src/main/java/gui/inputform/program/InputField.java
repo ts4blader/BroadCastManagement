@@ -53,22 +53,20 @@ public class InputField extends VBox {
 
     public InputField() throws Exception {
 
-        idField = getTextField("ID");
-        setValidator(idField, "Not match Requirement");
+        idField = MyLayout.getTextField("ID");
+        MyLayout.setValidator(idField, "Not match Requirement");
 
-        nameField = getTextField("Name");
-        setValidator(nameField, "Not match Requirement");
+        nameField = MyLayout.getTextField("Name");
+        MyLayout.setValidator(nameField, "Not match Requirement");
 
 
         //====================== Channel Field ======================
 
         channelField = getChannelField();
 
-
         //================= Category Field ===================
 
         categoryField = getCategoryField();
-
 
         //============== Producer Field ==================
 
@@ -101,7 +99,7 @@ public class InputField extends VBox {
 
         channelSelector = getChannelSelector();
         channelSelector.setPrefHeight(MyLayout.INPUT_HEIGHT);
-        channelName = getTextField("Channel ID");
+        channelName = MyLayout.getTextField("Channel ID");
         channelName.prefWidthProperty().bind(this.widthProperty().multiply(0.5));
         channelName.setDisable(true);
 
@@ -118,7 +116,7 @@ public class InputField extends VBox {
         categorySelector = getCategorySelector();
         categorySelector.setPrefHeight(MyLayout.INPUT_HEIGHT);
 
-        categoryName = getTextField("Category ID");
+        categoryName = MyLayout.getTextField("Category ID");
         categoryName.setDisable(true);
         categoryName.prefWidthProperty().bind(this.widthProperty().multiply(0.5));
 
@@ -135,7 +133,7 @@ public class InputField extends VBox {
         producerSelector = getProducerSelector();
         producerSelector.setPrefHeight(MyLayout.INPUT_HEIGHT);
 
-        producerName = getTextField("Producer ID");
+        producerName = MyLayout.getTextField("Producer ID");
         producerName.setDisable(true);
         producerName.prefWidthProperty().bind(this.widthProperty().multiply(0.5));
 
@@ -150,13 +148,13 @@ public class InputField extends VBox {
 
         HBox hBox;
 
-        addBtn = getButton("Add", ImageGetter.ADD, MyLayout.ICON_SIZE);
+        addBtn = MyLayout.getJFXButton("Add", ImageGetter.ADD, MyLayout.ICON_SIZE);
         addBtn.setOnAction(e -> addProgram());
 
-        clearBtn = getButton("Clear", ImageGetter.CLEAR, MyLayout.ICON_SIZE);
+        clearBtn = MyLayout.getJFXButton("Clear", ImageGetter.CLEAR, MyLayout.ICON_SIZE);
         clearBtn.setOnAction(e -> clearInput());
 
-        searchBtn = getButton("Search", ImageGetter.SEARCH, MyLayout.ICON_SIZE);
+        searchBtn = MyLayout.getJFXButton("Search", ImageGetter.SEARCH, MyLayout.ICON_SIZE);
 
 
         //add to Button Bar
@@ -167,21 +165,6 @@ public class InputField extends VBox {
 
         return hBox;
 
-    }
-
-    public JFXTextField getTextField(String promtText) {
-
-        JFXTextField textField;
-
-        textField = new JFXTextField();
-        textField.setPrefHeight(30);
-        textField.setFont(new Font(MyLayout.FONT_SIZE));
-        textField.setPromptText(promtText);
-        textField.setLabelFloat(true);
-
-        textField.setOnAction(e -> addProgram());
-
-        return textField;
     }
 
     public JFXComboBox<Channel> getChannelSelector() {
@@ -239,25 +222,6 @@ public class InputField extends VBox {
         });
 
         return comboBox;
-    }
-
-    public JFXButton getButton(String Label, File image, int iconSize) {
-
-        JFXButton button = new JFXButton(Label);
-        ImageView imageView = ImageGetter.getImageView(image, iconSize);
-        button.setGraphic(imageView);
-
-        return button;
-    }
-
-    public void setValidator(JFXTextField textField, String message) {
-        RequiredFieldValidator validator = new RequiredFieldValidator();
-        validator.setMessage(message);
-        textField.setValidators(validator);
-        textField.focusedProperty().addListener((o, oldVla, newVal) -> {
-            if (!newVal)
-                textField.validate();
-        });
     }
 
     public boolean validatorProgram() {

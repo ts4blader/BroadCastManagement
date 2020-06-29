@@ -18,15 +18,15 @@ public class ProducerBLL {
         return FXCollections.observableArrayList(hollyWood, bollyWood, univeser);
     }
 
-    public static Producer getProByID(String ID){
+    public static Producer getProducerById(String id){
 
         ObservableList<Producer> producers = getAllProducer();
-
-        for (Producer pro : producers){
-            if(pro.getId().equals(ID)) return pro;
+        for( Producer producer : producers){
+            if(producer.getId().equals(id)) return producer;
         }
 
         return null;
+
     }
 
 }

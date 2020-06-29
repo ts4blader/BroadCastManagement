@@ -1,12 +1,12 @@
 package entities;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 public class Channel {
     private String id;
     private String name;
     private boolean isCenter;
-    private Date beginDate;
+    private LocalDate beginDate;
     private String city;
 
 
@@ -15,7 +15,7 @@ public class Channel {
         return this.getName();
     }
 
-    public Channel(String id, String name, boolean isCenter, Date beginDate, String city) {
+    public Channel(String id, String name, boolean isCenter, LocalDate beginDate, String city) {
         this.id = id;
         this.name = name;
         this.isCenter = isCenter;
@@ -48,11 +48,11 @@ public class Channel {
         isCenter = center;
     }
 
-    public Date getBeginDate() {
+    public LocalDate getBeginDate() {
         return beginDate;
     }
 
-    public void setBeginDate(Date beginDate) {
+    public void setBeginDate(LocalDate beginDate) {
         this.beginDate = beginDate;
     }
 

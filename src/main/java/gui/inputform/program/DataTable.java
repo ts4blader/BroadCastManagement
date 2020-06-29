@@ -1,6 +1,7 @@
 package gui.inputform.program;
 
 import bll.CategoryBLL;
+import bll.NationBLL;
 import bll.ProducerBLL;
 import bll.ProgramBLL;
 import entities.Category;
@@ -75,7 +76,6 @@ public class DataTable extends VBox {
 
         tableView = getTableView();
 
-
         //======================== Main Layout =============================
 
         getMainLayout();
@@ -88,20 +88,19 @@ public class DataTable extends VBox {
         tableColumn = new TableColumn<>(text);
 
         tableColumn.setCellValueFactory(new PropertyValueFactory<>(property));
-        tableColumn.setCellFactory(TextFieldTableCell.<Program>forTableColumn());
         tableColumn.setMinWidth(50);
 
         //Commit
-        tableColumn.setOnEditCommit((TableColumn.CellEditEvent<Program, String> e) -> {
-            TablePosition<Program, String> pos = e.getTablePosition();
-
-            String newValue = e.getNewValue();
-
-            int row = pos.getRow();
-            Program program = e.getTableView().getItems().get(row);
-
-            ProgramBLL.update(program);
-        });
+//        tableColumn.setOnEditCommit((TableColumn.CellEditEvent<Program, String> e) -> {
+//            TablePosition<Program, String> pos = e.getTablePosition();
+//
+//            String newValue = e.getNewValue();
+//
+//            int row = pos.getRow();
+//            Program program = e.getTableView().getItems().get(row);
+//
+//            ProgramBLL.update(program);
+//        });
 
         return tableColumn;
     }
@@ -124,18 +123,18 @@ public class DataTable extends VBox {
             }
         });
         //set cell factory
-        tableColumn.setCellFactory(ComboBoxTableCell.forTableColumn(CategoryBLL.getAllCategory()));
+//        tableColumn.setCellFactory(ComboBoxTableCell.forTableColumn(CategoryBLL.getAllCategory()));
         //Commit
-        tableColumn.setOnEditCommit((TableColumn.CellEditEvent<Program, Category> e) -> {
-            TablePosition<Program, Category> pos = e.getTablePosition();
-            //get new value
-            Category newCategory = e.getNewValue();
-            //get row
-            int row = pos.getRow();
-            Program program = e.getTableView().getItems().get(row);
-
-            ProgramBLL.update(program);
-        });
+//        tableColumn.setOnEditCommit((TableColumn.CellEditEvent<Program, Category> e) -> {
+//            TablePosition<Program, Category> pos = e.getTablePosition();
+//            //get new value
+//            Category newCategory = e.getNewValue();
+//            //get row
+//            int row = pos.getRow();
+//            Program program = e.getTableView().getItems().get(row);
+//
+//            ProgramBLL.update(program);
+//        });
 
         tableColumn.setMinWidth(100);
 
@@ -154,25 +153,23 @@ public class DataTable extends VBox {
             public ObservableValue<Producer> call(TableColumn.CellDataFeatures<Program, Producer> param) {
                 Program program = param.getValue();
 
-                String producerID = program.getProducerID();
-
-                Producer producer = ProducerBLL.getProByID(producerID);
+                Producer producer = ProducerBLL.getProducerById(program.getProducerID());
 
                 return new SimpleObjectProperty<Producer>(producer);
             }
         });
 
-        tableColumn.setCellFactory(ComboBoxTableCell.forTableColumn(ProducerBLL.getAllProducer()));
+//        tableColumn.setCellFactory(ComboBoxTableCell.forTableColumn(ProducerBLL.getAllProducer()));
 
-        tableColumn.setOnEditCommit((TableColumn.CellEditEvent<Program, Producer> e) -> {
-            TablePosition<Program, Producer> position = e.getTablePosition();
-
-            int row = position.getRow();
-
-            Program program = e.getTableView().getItems().get(row);
-
-            //update Producer
-        });
+//        tableColumn.setOnEditCommit((TableColumn.CellEditEvent<Program, Producer> e) -> {
+//            TablePosition<Program, Producer> position = e.getTablePosition();
+//
+//            int row = position.getRow();
+//
+//            Program program = e.getTableView().getItems().get(row);
+//
+//            //update Producer
+//        });
 
         tableColumn.setMinWidth(100);
 
@@ -185,31 +182,21 @@ public class DataTable extends VBox {
 
         HBox hBox = new HBox(MyLayout.SPACE);
 
-        saveBtn = getButton("Save", ImageGetter.SAVE, MyLayout.ICON_SIZE);
+        saveBtn = MyLayout.getButton("Save", ImageGetter.SAVE, MyLayout.ICON_SIZE);
 
-        redoBtn = getButton("Redo", ImageGetter.REDO, MyLayout.ICON_SIZE);
+        redoBtn = MyLayout.getButton("Redo", ImageGetter.REDO, MyLayout.ICON_SIZE);
 
-        undoBtn = getButton("Undo", ImageGetter.UNDO, MyLayout.ICON_SIZE);
+        undoBtn = MyLayout.getButton("Undo", ImageGetter.UNDO, MyLayout.ICON_SIZE);
 
-        deleteBtn = getButton("Delete", ImageGetter.DELETE, MyLayout.ICON_SIZE);
+        deleteBtn = MyLayout.getButton("Delete", ImageGetter.DELETE, MyLayout.ICON_SIZE);
 
-        deleteAllBtn = getButton("Delete All", ImageGetter.DELETE, MyLayout.ICON_SIZE);
+        deleteAllBtn = MyLayout.getButton("Delete All", ImageGetter.DELETE, MyLayout.ICON_SIZE);
 
         hBox.setAlignment(Pos.CENTER);
         hBox.getChildren().addAll(saveBtn, undoBtn, redoBtn, deleteBtn, deleteAllBtn);
 
         return hBox;
 
-    }
-
-    public Button getButton(String Label, File image, int iconSize) {
-
-        Button button = new Button(Label);
-        button.setGraphic(ImageGetter.getImageView(image, iconSize));
-        button.setOnAction(e -> {
-        });
-
-        return button;
     }
 
     public TableView<Program> getTableView() {

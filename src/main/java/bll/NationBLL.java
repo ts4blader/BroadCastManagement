@@ -16,5 +16,14 @@ public class NationBLL {
 
     }
 
+    public static Nation getNationById(String id){
 
+        ObservableList<Nation> nations = getAllNation();
+
+        for ( Nation nation : nations){
+            if(nation.getId().equals(id)) return nation;
+        }
+
+        return null;
+    }
 }

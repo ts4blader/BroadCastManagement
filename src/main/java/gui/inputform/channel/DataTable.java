@@ -1,19 +1,17 @@
 package gui.inputform.channel;
 
 import bll.CategoryBLL;
+import bll.ChannelBLL;
 import bll.ProducerBLL;
 import bll.ProgramBLL;
-import entities.Category;
-import entities.Nation;
-import entities.Producer;
-import entities.Program;
+import entities.*;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Pos;
-import javafx.scene.control.Button;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TablePosition;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
+import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
@@ -23,24 +21,28 @@ import javafx.util.Callback;
 import utilities.ImageGetter;
 import utilities.MyLayout;
 
+import javax.security.auth.callback.LanguageCallback;
 import java.io.File;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.util.Date;
 
 public class DataTable extends VBox {
 
     public final static int ICON_SIZE = 15;
 
     //TableView
-    private TableView<Program> tableView;
+    private TableView<Channel> tableView;
     //ID Col
-    private TableColumn<Program, String> idCol;
+    private TableColumn<Channel, String> idCol;
     //Name Col
-    private TableColumn<Program, String> nameCol;
-    //Category Col
-    private TableColumn<Program, Category> categoryCol;
-    //Producer Col
-    private TableColumn<Program, Producer> producerCol;
-    //Nation Col
-    private TableColumn<Program, Nation> nationCol;
+    private TableColumn<Channel, String> nameCol;
+    //is Center Col
+    private TableColumn<Channel, Boolean> isCenterCol;
+    //Date Col
+    private TableColumn<Channel, LocalDate> beginDateCol;
+    //City Col
+    private TableColumn<Channel, String> cityCol;
     //Button Bar
     private HBox buttonBar;
     //Buttons
@@ -62,13 +64,17 @@ public class DataTable extends VBox {
 
         nameCol = getTextCol("Name", "name");
 
-        //====================== Category Col ======================
+        //====================== isCenter CheckBox ======================
 
-        categoryCol = getCategoryCol();
+        createIsCenterCol();
 
-        //====================== Producer Col ======================
+        //====================== Begin Date Col ======================
 
-        producerCol = getProducerCol();
+        beginDateCol = new TableColumn<>("Begin");
+
+        //====================== City Col ======================
+
+        cityCol = getTextCol("City","cityDou");
 
         //====================== Button Bar ======================
 
@@ -78,125 +84,36 @@ public class DataTable extends VBox {
 
         tableView = getTableView();
 
-
         //======================== Main Layout =============================
 
         getMainLayout();
 
     }
 
-    public TableColumn<Program, String> getTextCol(String text, String property) {
+    public TableColumn<Channel, String> getTextCol(String text, String property) {
 
-        TableColumn<Program, String> tableColumn;
+        TableColumn<Channel, String> tableColumn;
         tableColumn = new TableColumn<>(text);
 
         tableColumn.setCellValueFactory(new PropertyValueFactory<>(property));
-        tableColumn.setCellFactory(TextFieldTableCell.<Program>forTableColumn());
         tableColumn.setMinWidth(50);
 
-        //Commit
-        tableColumn.setOnEditCommit((TableColumn.CellEditEvent<Program, String> e) -> {
-            TablePosition<Program, String> pos = e.getTablePosition();
-
-            String newValue = e.getNewValue();
-
-            int row = pos.getRow();
-            Program program = e.getTableView().getItems().get(row);
-
-            ProgramBLL.update(program);
-        });
-
         return tableColumn;
-    }
-
-    public TableColumn<Program, Category> getCategoryCol() {
-
-        TableColumn<Program, Category> tableColumn;
-        tableColumn = new TableColumn<>("Category");
-
-        tableColumn.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Program, Category>, ObservableValue<Category>>() {
-            @Override
-            public ObservableValue<Category> call(TableColumn.CellDataFeatures<Program, Category> param) {
-                Program program = param.getValue();
-
-                String categoryID = program.getCategoryID();
-                Category category = CategoryBLL.getCategoryByID(categoryID);
-
-
-                return new SimpleObjectProperty<Category>(category);
-            }
-        });
-        //set cell factory
-        tableColumn.setCellFactory(ComboBoxTableCell.forTableColumn(CategoryBLL.getAllCategory()));
-        //Commit
-        tableColumn.setOnEditCommit((TableColumn.CellEditEvent<Program, Category> e) -> {
-            TablePosition<Program, Category> pos = e.getTablePosition();
-            //get new value
-            Category newCategory = e.getNewValue();
-            //get row
-            int row = pos.getRow();
-            Program program = e.getTableView().getItems().get(row);
-
-            ProgramBLL.update(program);
-        });
-
-        tableColumn.setMinWidth(100);
-
-        return tableColumn;
-
-
-    }
-
-    public TableColumn<Program, Producer> getProducerCol() {
-
-        TableColumn<Program, Producer> tableColumn;
-        tableColumn = new TableColumn<>("Producer");
-
-        tableColumn.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Program, Producer>, ObservableValue<Producer>>() {
-            @Override
-            public ObservableValue<Producer> call(TableColumn.CellDataFeatures<Program, Producer> param) {
-                Program program = param.getValue();
-
-                String producerID = program.getProducerID();
-
-                Producer producer = ProducerBLL.getProByID(producerID);
-
-                return new SimpleObjectProperty<Producer>(producer);
-            }
-        });
-
-        tableColumn.setCellFactory(ComboBoxTableCell.forTableColumn(ProducerBLL.getAllProducer()));
-
-        tableColumn.setOnEditCommit((TableColumn.CellEditEvent<Program, Producer> e) -> {
-            TablePosition<Program, Producer> position = e.getTablePosition();
-
-            int row = position.getRow();
-
-            Program program = e.getTableView().getItems().get(row);
-
-            //update Producer
-        });
-
-        tableColumn.setMinWidth(100);
-
-        return tableColumn;
-
-
     }
 
     public HBox getButtonBar() {
 
         HBox hBox = new HBox(MyLayout.SPACE);
 
-        saveBtn = getButton("Save", ImageGetter.SAVE, MyLayout.ICON_SIZE);
+        saveBtn = MyLayout.getButton("Save", ImageGetter.SAVE, MyLayout.ICON_SIZE);
 
-        redoBtn = getButton("Redo", ImageGetter.REDO, MyLayout.ICON_SIZE);
+        redoBtn = MyLayout.getButton("Redo", ImageGetter.REDO, MyLayout.ICON_SIZE);
 
-        undoBtn = getButton("Undo", ImageGetter.UNDO, MyLayout.ICON_SIZE);
+        undoBtn = MyLayout.getButton("Undo", ImageGetter.UNDO, MyLayout.ICON_SIZE);
 
-        deleteBtn = getButton("Delete", ImageGetter.DELETE, MyLayout.ICON_SIZE);
+        deleteBtn = MyLayout.getButton("Delete", ImageGetter.DELETE, MyLayout.ICON_SIZE);
 
-        deleteAllBtn = getButton("Delete All", ImageGetter.DELETE, MyLayout.ICON_SIZE);
+        deleteAllBtn = MyLayout.getButton("Delete All", ImageGetter.DELETE, MyLayout.ICON_SIZE);
 
         hBox.setAlignment(Pos.CENTER);
         hBox.getChildren().addAll(saveBtn, undoBtn, redoBtn, deleteBtn, deleteAllBtn);
@@ -205,25 +122,43 @@ public class DataTable extends VBox {
 
     }
 
-    public Button getButton(String Label, File image, int iconSize) {
+    public void createIsCenterCol(){
 
-        Button button = new Button(Label);
-        button.setGraphic(ImageGetter.getImageView(image, iconSize));
-        button.setOnAction(e -> {
+        isCenterCol = new TableColumn<>("Center");
+
+        isCenterCol.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Channel, Boolean>, ObservableValue<Boolean>>() {
+            @Override
+            public ObservableValue<Boolean> call(TableColumn.CellDataFeatures<Channel, Boolean> param) {
+                Channel channel = param.getValue();
+
+                SimpleBooleanProperty property = new SimpleBooleanProperty(channel.isCenter());
+
+                return property;
+            }
         });
 
-        return button;
+        isCenterCol.setCellFactory(new Callback<TableColumn<Channel, Boolean>, TableCell<Channel, Boolean>>() {
+            @Override
+            public TableCell<Channel, Boolean> call(TableColumn<Channel, Boolean> param) {
+                CheckBoxTableCell<Channel, Boolean> cell = new CheckBoxTableCell<>();
+                cell.getStyleClass().addAll("isCenterCol");
+                cell.setDisable(true);
+                return cell;
+            }
+        });
+
+
     }
 
-    public TableView<Program> getTableView() {
+    public TableView<Channel> getTableView() {
 
-        TableView<Program> tableView = new TableView<>();
+        TableView<Channel> tableView = new TableView<>();
 
-        tableView.setItems(ProgramBLL.getAllProgram());
+        tableView.setItems(ChannelBLL.getAllChannel());
         tableView.setMinHeight(450);
         tableView.setEditable(true);
         tableView.prefHeightProperty().bind(this.heightProperty().divide(5.5 / 4.5));
-        tableView.getColumns().addAll(idCol, nameCol, categoryCol, producerCol);
+        tableView.getColumns().addAll(idCol, nameCol, isCenterCol, beginDateCol, cityCol);
 
         return tableView;
     }

@@ -94,3 +94,6 @@ Channel Tab
 .exampleDate{
     -fx-text-fill: #333;
 }
+.isCenterCol{
+    -fx-alignment: CENTER;
+}

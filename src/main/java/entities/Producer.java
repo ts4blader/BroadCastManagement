@@ -1,5 +1,6 @@
 package entities;
 
+
 public class Producer {
     private String id;
     private String name;
@@ -38,4 +39,5 @@ public class Producer {
     public void setNationID(String nationID) {
         this.nationID = nationID;
     }
+
 }
