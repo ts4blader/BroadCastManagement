@@ -8,6 +8,7 @@ import entities.Category;
 import entities.Channel;
 import entities.Producer;
 import entities.Program;
+import javafx.scene.control.SingleSelectionModel;
 import utilities.ImageGetter;
 import utilities.MyDialog;
 import utilities.MyLayout;
@@ -28,21 +29,21 @@ public class InputField extends VBox {
 
 
     //Define var
-    private JFXTextField idField;
+    private static JFXTextField idField;
 
-    private JFXTextField nameField;
+    private static JFXTextField nameField;
 
     private HBox channelField;
-    private JFXComboBox<Channel> channelSelector;
-    private JFXTextField channelName;
+    private static JFXComboBox<Channel> channelSelector;
+    private static JFXTextField channelName;
 
     private HBox categoryField;
-    private JFXComboBox<Category> categorySelector;
-    private JFXTextField categoryName;
+    private static JFXComboBox<Category> categorySelector;
+    private static JFXTextField categoryName;
 
     private HBox producerField;
-    private JFXComboBox<Producer> producerSelector;
-    private JFXTextField producerName;
+    private static JFXComboBox<Producer> producerSelector;
+    private static JFXTextField producerName;
 
     private HBox buttonBar;
 
@@ -99,8 +100,8 @@ public class InputField extends VBox {
 
         channelSelector = getChannelSelector();
         channelSelector.setPrefHeight(MyLayout.INPUT_HEIGHT);
-        channelName = MyLayout.getTextField("Channel ID");
-        channelName.prefWidthProperty().bind(this.widthProperty().multiply(0.5));
+        channelName = MyLayout.getSubTextField("Channel ID");
+        channelName.prefWidthProperty().bind(this.widthProperty().multiply(MyLayout.NAME_FIELD));
         channelName.setDisable(true);
 
         hBox = new HBox(10);
@@ -116,9 +117,9 @@ public class InputField extends VBox {
         categorySelector = getCategorySelector();
         categorySelector.setPrefHeight(MyLayout.INPUT_HEIGHT);
 
-        categoryName = MyLayout.getTextField("Category ID");
+        categoryName = MyLayout.getSubTextField("Category ID");
         categoryName.setDisable(true);
-        categoryName.prefWidthProperty().bind(this.widthProperty().multiply(0.5));
+        categoryName.prefWidthProperty().bind(this.widthProperty().multiply(MyLayout.NAME_FIELD));
 
         hBox = new HBox(15);
         hBox.getChildren().addAll(categorySelector, categoryName);
@@ -133,9 +134,9 @@ public class InputField extends VBox {
         producerSelector = getProducerSelector();
         producerSelector.setPrefHeight(MyLayout.INPUT_HEIGHT);
 
-        producerName = MyLayout.getTextField("Producer ID");
+        producerName = MyLayout.getSubTextField("Producer ID");
         producerName.setDisable(true);
-        producerName.prefWidthProperty().bind(this.widthProperty().multiply(0.5));
+        producerName.prefWidthProperty().bind(this.widthProperty().multiply(MyLayout.NAME_FIELD));
 
         hBox = new HBox(15);
         hBox.getChildren().addAll(producerSelector, producerName);
@@ -174,7 +175,7 @@ public class InputField extends VBox {
         comboBox = new JFXComboBox<>();
         comboBox.setPromptText("Channel");
         comboBox.setLabelFloat(true);
-        comboBox.prefWidthProperty().bind(this.widthProperty().multiply(0.5));
+        comboBox.prefWidthProperty().bind(this.widthProperty().multiply(MyLayout.SELECTOR_FIELD));
         comboBox.setItems(ChannelBLL.getAllChannel());
 
         comboBox.setOnAction(e -> channelName.setText(comboBox.getValue().getId()));
@@ -193,7 +194,7 @@ public class InputField extends VBox {
         comboBox = new JFXComboBox<>();
         comboBox.setPromptText("Category");
         comboBox.setLabelFloat(true);
-        comboBox.prefWidthProperty().bind(this.widthProperty().multiply(0.5));
+        comboBox.prefWidthProperty().bind(this.widthProperty().multiply(MyLayout.SELECTOR_FIELD));
         comboBox.setItems(CategoryBLL.getAllCategory());
 
         comboBox.setOnAction(e -> categoryName.setText(comboBox.getValue().getId()));
@@ -212,7 +213,7 @@ public class InputField extends VBox {
         comboBox = new JFXComboBox<>();
         comboBox.setPromptText("Producer");
         comboBox.setLabelFloat(true);
-        comboBox.prefWidthProperty().bind(this.widthProperty().multiply(0.5));
+        comboBox.prefWidthProperty().bind(this.widthProperty().multiply(MyLayout.SELECTOR_FIELD));
         comboBox.setItems(ProducerBLL.getAllProducer());
 
         comboBox.setOnAction(e -> producerName.setText(comboBox.getValue().getId()));
@@ -270,9 +271,9 @@ public class InputField extends VBox {
         try {
             idField.setText("");
             nameField.setText("");
-            channelSelector.setValue(null);
-            categorySelector.setValue(null);
-            producerSelector.setValue(null);
+            channelSelector.setValue(new Channel());
+            categorySelector.setValue(new Category());
+            producerSelector.setValue(new Producer());
 
             return true;
         } catch (Exception e) {
@@ -281,5 +282,21 @@ public class InputField extends VBox {
             return false;
         }
     }
-    //====================== End =================================
+
+    public static boolean setProgramFromTable(Program program){
+
+        try {
+            idField.setText(program.getId());
+            nameField.setText(program.getName());
+            categorySelector.setValue(CategoryBLL.getCategoryByID(program.getCategoryID()));
+            producerSelector.setValue(ProducerBLL.getProducerById(program.getProducerID()));
+
+            return true;
+        } catch (Exception e){
+            MyDialog.showDialog("Set Program From Table", null, "Unknown Error",MyDialog.ERRO);
+        }
+        return false;
+
+    }
+
 }

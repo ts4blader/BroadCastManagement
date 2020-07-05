@@ -10,12 +10,13 @@ import javafx.scene.control.Label;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 import utilities.ImageGetter;
 import utilities.MyDialog;
 import utilities.MyLayout;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
@@ -24,17 +25,17 @@ public class InputField extends VBox {
 
 
     //Define var
-    private JFXTextField idField;
+    private static JFXTextField idField;
 
-    private JFXTextField nameField;
+    private static JFXTextField nameField;
 
-    private JFXCheckBox isCenterBox;
+    private static JFXCheckBox isCenterBox;
 
     private VBox dateField;
-    private JFXTextField beginDateField;
-    private Label exampleDate;
+    private static JFXTextField beginDateField;
+    private Text exampleDate;
 
-    private JFXTextField cityField;
+    private static JFXTextField cityField;
 
     private HBox buttonBar;
 
@@ -43,7 +44,7 @@ public class InputField extends VBox {
     private JFXButton searchBtn;
 
 
-    public InputField() throws Exception {
+    public InputField() {
 
         idField = MyLayout.getTextField("ID");
         idField.setOnAction( e -> addChannel());
@@ -148,8 +149,9 @@ public class InputField extends VBox {
         beginDateField = MyLayout.getTextField("Begin Date");
         beginDateField.setOnAction( e -> addChannel());
 
-        exampleDate = new Label("Ex: 07/04/1999, 07-04-1999");
-        exampleDate.getStyleClass().addAll("exampleDate");
+        exampleDate = new Text("Example: 07/04/1999, 07-04-1999");
+        exampleDate.setFill(Color.valueOf("#666"));
+        exampleDate.setFont(new Font(17));
 
         dateField = new VBox(MyLayout.SPACE);
         dateField.getChildren().addAll(beginDateField, exampleDate);
@@ -193,6 +195,23 @@ public class InputField extends VBox {
         } finally {
             return false;
         }
+    }
+
+    public static boolean setChannelFromTable(Channel channel){
+
+        try {
+            idField.setText(channel.getId());
+            nameField.setText(channel.getName());
+            isCenterBox.setSelected(channel.isCenter());
+            cityField.setText(channel.getCity());
+            beginDateField.setText(DateTimeFormatter.ofPattern("dd/MM/yyyy").format(channel.getBeginDate()));
+
+            return true;
+        } catch (Exception e){
+            MyDialog.showDialog("Set Channel From DataTable",null,"Unknown Error",MyDialog.ERRO);
+        }
+
+        return false;
     }
     //====================== End =================================
 }

@@ -9,6 +9,10 @@ public class Program {
 
     private static int cout = 0;
 
+    public Program() {
+        name = "";
+    }
+
     public Program(String id, String name, String categoryID, String producerID) {
         this.id = id;
         this.name = name;
@@ -56,6 +60,8 @@ public class Program {
         Program.cout = cout;
     }
 
-
-
+    @Override
+    public String toString() {
+        return getName();
+    }
 }

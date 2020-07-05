@@ -31,4 +31,15 @@ public class ChannelBLL {
 
     }
 
+    public static Channel getChannelById(String id){
+
+        ObservableList<Channel> channels = getAllChannel();
+
+        for (Channel channel : channels){
+            if(channel.getId().equals(id)) return channel;
+        }
+
+        return null;
+
+    }
 }

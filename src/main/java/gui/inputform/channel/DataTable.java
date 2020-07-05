@@ -4,6 +4,7 @@ import bll.CategoryBLL;
 import bll.ChannelBLL;
 import bll.ProducerBLL;
 import bll.ProgramBLL;
+import com.mysql.cj.xdevapi.Table;
 import entities.*;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -25,6 +26,7 @@ import javax.security.auth.callback.LanguageCallback;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
 public class DataTable extends VBox {
@@ -70,11 +72,11 @@ public class DataTable extends VBox {
 
         //====================== Begin Date Col ======================
 
-        beginDateCol = new TableColumn<>("Begin");
+        createBeginDateCol();
 
         //====================== City Col ======================
 
-        cityCol = getTextCol("City","cityDou");
+        cityCol = getTextCol("City","city");
 
         //====================== Button Bar ======================
 
@@ -141,13 +143,30 @@ public class DataTable extends VBox {
             @Override
             public TableCell<Channel, Boolean> call(TableColumn<Channel, Boolean> param) {
                 CheckBoxTableCell<Channel, Boolean> cell = new CheckBoxTableCell<>();
-                cell.getStyleClass().addAll("isCenterCol");
+                cell.getStyleClass().addAll("table-cell-center");
                 cell.setDisable(true);
                 return cell;
             }
         });
 
 
+    }
+
+    public void createBeginDateCol() {
+        beginDateCol = new TableColumn<>("Begin");
+        beginDateCol.setCellValueFactory(cellData -> cellData.getValue().getBeginDateProperty());
+        beginDateCol.setCellFactory(column -> {
+            return new TableCell<Channel, LocalDate>(){
+                @Override
+                protected void updateItem(LocalDate item, boolean empty) {
+                    if(item == null || empty)
+                        setText("");
+                    else
+                        setText(DateTimeFormatter.ofPattern("dd/MM/yyyy").format(item));
+                }
+            };
+        });
+        beginDateCol.setMinWidth(100);
     }
 
     public TableView<Channel> getTableView() {
@@ -159,6 +178,14 @@ public class DataTable extends VBox {
         tableView.setEditable(true);
         tableView.prefHeightProperty().bind(this.heightProperty().divide(5.5 / 4.5));
         tableView.getColumns().addAll(idCol, nameCol, isCenterCol, beginDateCol, cityCol);
+        tableView.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Channel>() {
+            @Override
+            public void changed(ObservableValue<? extends Channel> observable, Channel oldValue, Channel newValue) {
+                if(tableView.getSelectionModel().getSelectedItem() != null){
+                    InputField.setChannelFromTable(newValue);
+                }
+            }
+        });
 
         return tableView;
     }

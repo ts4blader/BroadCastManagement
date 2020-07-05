@@ -1,40 +1,49 @@
 package entities;
 
-import java.util.Date;
+import javafx.beans.property.SimpleObjectProperty;
+
+import java.time.LocalTime;
+import java.util.ArrayList;
 
 public class ScheduleProgram {
-    private Program program;
-    private Channel channel;
-    private Date time;
+    private String programID;
+    private String channelID;
+    private LocalTime time;
+    private ArrayList<Boolean> dayOfWeek;
     private int duration;
     private int chapter;
 
 
-    public int getDay(){
-        return time.getDay();
+    public ScheduleProgram(String programID, String channelID, LocalTime time, ArrayList<Boolean> dayOfWeek, int duration, int chapter) {
+        this.programID = programID;
+        this.channelID = channelID;
+        this.time = time;
+        this.dayOfWeek = dayOfWeek;
+        this.duration = duration;
+        this.chapter = chapter;
     }
 
-    public Program getProgram() {
-        return program;
+    public String getProgramID() {
+        return programID;
     }
 
-    public void setProgram(Program program) {
-        this.program = program;
+    public void setProgramID(String programID) {
+        this.programID = programID;
     }
 
-    public Channel getChannel() {
-        return channel;
+    public String getChannelID() {
+        return channelID;
     }
 
-    public void setChannel(Channel channel) {
-        this.channel = channel;
+    public void setChannelID(String channelID) {
+        this.channelID = channelID;
     }
 
-    public Date getTime() {
+    public LocalTime getTime() {
         return time;
     }
 
-    public void setTime(Date time) {
+    public void setTime(LocalTime time) {
         this.time = time;
     }
 
@@ -54,25 +63,23 @@ public class ScheduleProgram {
         this.chapter = chapter;
     }
 
-    public String getDayInWeek(){
-        switch (time.getDay()){
-            case 0:
-                return "Sun";
-            case 1:
-                return "Mon";
-            case 2:
-                return "Tue";
-            case 3:
-                return "Wed";
-            case 4:
-                return "Thu";
-            case 5:
-                return "Fri";
-            case 6:
-                return "Sat";
-            default:
-                return "Undefined";
-        }
+    public SimpleObjectProperty<LocalTime> getTimeProperty(){
+        return new SimpleObjectProperty<>(time);
     }
 
+    public SimpleObjectProperty<ArrayList<Boolean>> getDayOfWeekProperty(){
+        return new SimpleObjectProperty<>(dayOfWeek);
+    }
+
+    public ArrayList<Boolean> getDayOfWeek() {
+        return dayOfWeek;
+    }
+
+    public void setDayOfWeek(ArrayList<Boolean> dayOfWeek) {
+        this.dayOfWeek = dayOfWeek;
+    }
+
+    public SimpleObjectProperty<Boolean> getDayOfWeekProperty(int index){
+        return new SimpleObjectProperty<>(dayOfWeek.get(index));
+    }
 }

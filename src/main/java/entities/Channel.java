@@ -1,5 +1,9 @@
 package entities;
 
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleObjectProperty;
+
 import java.time.LocalDate;
 
 public class Channel {
@@ -13,6 +17,10 @@ public class Channel {
     @Override
     public String toString() {
         return this.getName();
+    }
+
+    public Channel(){
+        this.name = "";
     }
 
     public Channel(String id, String name, boolean isCenter, LocalDate beginDate, String city) {
@@ -62,5 +70,11 @@ public class Channel {
 
     public void setCity(String city) {
         this.city = city;
+    }
+
+    public SimpleObjectProperty<LocalDate> getBeginDateProperty(){
+
+        return new SimpleObjectProperty<>(beginDate );
+
     }
 }

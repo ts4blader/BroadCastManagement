@@ -9,6 +9,10 @@ public class Nation {
         this.name = name;
     }
 
+    public Nation() {
+        name = "";
+    }
+
     public String getId() {
         return id;
     }

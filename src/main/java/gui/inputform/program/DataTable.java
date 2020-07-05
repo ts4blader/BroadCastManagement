@@ -8,6 +8,7 @@ import entities.Category;
 import entities.Nation;
 import entities.Producer;
 import entities.Program;
+import javafx.beans.value.ChangeListener;
 import utilities.ImageGetter;
 import utilities.MyLayout;
 import javafx.beans.property.SimpleObjectProperty;
@@ -67,6 +68,10 @@ public class DataTable extends VBox {
         //====================== Producer Col ======================
 
         producerCol = getProducerCol();
+
+        //====================== Nation Col ======================
+
+        nationCol = getNationCol();
 
         //====================== Button Bar ======================
 
@@ -178,6 +183,30 @@ public class DataTable extends VBox {
 
     }
 
+    public TableColumn<Program, Nation> getNationCol(){
+
+        TableColumn<Program, Nation> tableColumn = new TableColumn<>("Nation");
+        tableColumn.setCellValueFactory( cellData -> {
+            Producer producer = ProducerBLL.getProducerById(cellData.getValue().getProducerID());
+
+            return producer.getNationProperty();
+        });
+
+        tableColumn.setCellFactory( column -> {
+            return new TableCell<Program, Nation>(){
+                @Override
+                protected void updateItem(Nation item, boolean empty) {
+                    if(item == null || empty)
+                        setText("");
+                    else
+                        setText(item.getName());
+                }
+            };
+        });
+
+        return tableColumn;
+    }
+
     public HBox getButtonBar() {
 
         HBox hBox = new HBox(MyLayout.SPACE);
@@ -207,7 +236,15 @@ public class DataTable extends VBox {
         tableView.setMinHeight(450);
         tableView.setEditable(true);
         tableView.prefHeightProperty().bind(this.heightProperty().divide(5.5 / 4.5));
-        tableView.getColumns().addAll(idCol, nameCol, categoryCol, producerCol);
+        tableView.getColumns().addAll(idCol, nameCol, categoryCol, producerCol, nationCol);
+        tableView.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Program>() {
+            @Override
+            public void changed(ObservableValue<? extends Program> observable, Program oldValue, Program newValue) {
+                if(tableView.getSelectionModel().getSelectedItem() != null){
+                    InputField.setProgramFromTable(newValue);
+                }
+            }
+        });
 
         return tableView;
     }

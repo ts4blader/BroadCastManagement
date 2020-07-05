@@ -10,6 +10,10 @@ public class Category {
         return this.name;
     }
 
+    public Category(){
+        this.name = "";
+    }
+
     public Category(String id, String name) {
         this.id = id;
         this.name = name;

@@ -5,7 +5,9 @@
 .root{
     mainColor: #16a085;
 }
-
+.font-bold{
+    -fx-font-weight: bold;
+}
 /*
     The tab bar
 */
@@ -91,9 +93,6 @@ Bot Pane - Main Menu
 /*
 Channel Tab
 */
-.exampleDate{
-    -fx-text-fill: #333;
-}
-.isCenterCol{
+.table-cell-center{
     -fx-alignment: CENTER;
 }

@@ -12,17 +12,26 @@ import javafx.scene.layout.HBox;
 import javafx.scene.text.Font;
 
 import java.io.File;
+import java.util.HashMap;
 
 public class MyLayout {
 
     public final static int ICON_SIZE = 15;
     public final static int FONT_SIZE = 16;
+    public final static int SUB_FONT_SIZE = 14;
     public final static int INPUT_HEIGHT = 30;
     public final static double DIVIDER = 0.4;
+
+    public final static double NAME_FIELD = 0.4;
+    public final static double SELECTOR_FIELD = 0.6;
 
     public final static int SPACE = 10;
     public final static int NORMAL_SPACE = 25;
     public final static int BIG_SPACE = 40;
+
+    public final static String[] dayOfWeek = {
+            "Mon", "Tue", "Web", "Thu", "Fri", "Sat", "Sun"
+    };
 
     public static JFXButton getJFXButton(String Label, File image, int iconSize) {
 
@@ -48,7 +57,21 @@ public class MyLayout {
 
         textField = new JFXTextField();
         textField.setPrefHeight(30);
-        textField.setFont(new Font(MyLayout.FONT_SIZE));
+        textField.setFont(new Font(FONT_SIZE));
+        textField.setPromptText(promtText);
+        textField.setLabelFloat(true);
+
+
+        return textField;
+    }
+
+    public static JFXTextField getSubTextField(String promtText) {
+
+        JFXTextField textField;
+
+        textField = new JFXTextField();
+        textField.setPrefHeight(30);
+        textField.setFont(new Font(SUB_FONT_SIZE));
         textField.setPromptText(promtText);
         textField.setLabelFloat(true);
 

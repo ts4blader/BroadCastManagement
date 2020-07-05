@@ -25,4 +25,10 @@ public class CategoryBLL {
 
         return null;
     }
+
+    public static void addCategory(Category category){
+
+
+
+    }
 }

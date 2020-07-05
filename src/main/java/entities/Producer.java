@@ -1,6 +1,9 @@
 package entities;
 
 
+import bll.NationBLL;
+import javafx.beans.property.SimpleObjectProperty;
+
 public class Producer {
     private String id;
     private String name;
@@ -8,6 +11,10 @@ public class Producer {
 
     public String toString(){
         return this.name;
+    }
+
+    public Producer(){
+        this.name = "";
     }
 
     public Producer(String id, String name, String nation) {
@@ -38,6 +45,12 @@ public class Producer {
 
     public void setNationID(String nationID) {
         this.nationID = nationID;
+    }
+
+    public SimpleObjectProperty<Nation> getNationProperty(){
+
+        return new SimpleObjectProperty<>(NationBLL.getNationById(getNationID()));
+
     }
 
 }
