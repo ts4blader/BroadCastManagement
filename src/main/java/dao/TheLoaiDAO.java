@@ -57,8 +57,8 @@ public class TheLoaiDAO implements IDAO<TheLoai> {
 	public boolean save(TheLoai theLoai) {
 		try {
 			rowSet.moveToInsertRow();
-			rowSet.updateString("matl", theLoai.getMaTheLoai());
-			rowSet.updateString("tentl", theLoai.getTenTheLoai());
+			rowSet.updateString("MATL", theLoai.getMaTheLoai());
+			rowSet.updateString("TENTL", theLoai.getTenTheLoai());
 			rowSet.insertRow();
 			rowSet.moveToCurrentRow();
 			return true;

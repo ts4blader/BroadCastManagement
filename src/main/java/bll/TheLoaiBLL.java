@@ -22,6 +22,7 @@ public class TheLoaiBLL {
 
     public static ObservableList<TheLoai> get(TheLoai theLoai){
 
+        theLoai.setMaTheLoai("");
         return FXCollections.observableArrayList(dao.getByObj(theLoai));
     }
 

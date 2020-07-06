@@ -111,7 +111,12 @@ public class DataTable extends VBox {
 
     }
 
-
+    public static void refreshTable(){
+        tableView.setItems(TheLoaiBLL.getAll());
+    }
+    public static void setItems(ObservableList<TheLoai> list){
+        tableView.setItems(list);
+    }
     //====================== Controller ======================
 
     public void createButton(){
@@ -135,6 +140,7 @@ public class DataTable extends VBox {
             MyDialog.showDialog("Non Selected Item",null, "Select an Item Pls",MyDialog.ERRO);
         for(TheLoai item : list)
             TheLoaiBLL.delete(item);
+        refreshTable();
 
     }
 
@@ -145,5 +151,6 @@ public class DataTable extends VBox {
             TheLoaiBLL.delete(item);
         MyDialog.showDialog("Delete Success",null, "Done!", MyDialog.INFO);
 
+        refreshTable();
     }
 }

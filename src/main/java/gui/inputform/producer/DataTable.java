@@ -1,7 +1,9 @@
 package gui.inputform.producer;
 
+import bll.KenhTVBLL;
 import bll.QuocGiaBLL;
 import bll.NhaSXBLL;
+import dto.KenhTV;
 import dto.NhaSX;
 import dto.QuocGia;
 import javafx.beans.property.SimpleObjectProperty;
@@ -139,6 +141,14 @@ public class DataTable extends VBox {
 
     }
 
+    public static void refreshTable(){
+        tableView.setItems(NhaSXBLL.getAll());
+    }
+
+    public static void setItems(ObservableList<NhaSX> items){
+        tableView.setItems(items);
+    }
+
     //====================== Controller ======================
 
     public void createButton(){
@@ -162,6 +172,7 @@ public class DataTable extends VBox {
             MyDialog.showDialog("Non Selected Item",null, "Select an Item Pls",MyDialog.ERRO);
         for(NhaSX item : list)
             NhaSXBLL.delete(item);
+        refreshTable();
 
     }
 
@@ -170,6 +181,7 @@ public class DataTable extends VBox {
         ObservableList<NhaSX> list = tableView.getItems();
         for(NhaSX item : list)
             NhaSXBLL.delete(item);
+        refreshTable();
         MyDialog.showDialog("Delete Success",null, "Done!", MyDialog.INFO);
 
     }

@@ -321,15 +321,19 @@ public class InputField extends VBox {
         if(!validator()) return;
         ChuongTrinhBLL.save(getObjFormField());
         idField.setFocusTraversable(true);
+        DataTable.refreshTable();
 
     }
 
-    public static ObservableList<ChuongTrinh> search(){
-        return ChuongTrinhBLL.get(getObjFormField());
+    public static void search(){
+
+        DataTable.setItems(ChuongTrinhBLL.get(getObjFormField()));
+
     }
 
     public static void update(){
         ChuongTrinhBLL.update(getObjFormField());
+        DataTable.refreshTable();
         MyDialog.showDialog("Update",null,"Update Success",MyDialog.INFO);
     }
 

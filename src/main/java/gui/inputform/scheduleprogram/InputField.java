@@ -379,15 +379,17 @@ public class InputField extends VBox {
         if(!validator()) return;
         LichPhatSongBLL.save(getObjFormField());
         chuongTrinhSelector.setFocusTraversable(true);
+        DataTable.refreshTable();
 
     }
 
-    public static ObservableList<LichPhatSong> search(){
-        return LichPhatSongBLL.get(getObjFormField());
+    public static void search(){
+        DataTable.setItems(LichPhatSongBLL.get(getObjFormField()));
     }
 
     public static void update(){
         LichPhatSongBLL.update(getObjFormField());
+        DataTable.refreshTable();
         MyDialog.showDialog("Update",null,"Update Success",MyDialog.INFO);
     }
 }

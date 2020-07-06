@@ -79,7 +79,8 @@ public class KenhTV {
 		return null;
 	}
 	public int getIntBySTT (int i) {
-
+		if (i == 5)
+			return this.thuocTU;
 		return -1;
 	}
 

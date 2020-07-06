@@ -115,7 +115,8 @@ public class InputField extends VBox {
 
         String id = idField.getText().trim();
         String name = nameField.getText().trim();
-
+        System.out.println(id);
+        System.out.println(name);
         return new TheLoai(id, name);
 
     }
@@ -154,14 +155,17 @@ public class InputField extends VBox {
         TheLoaiBLL.save(getObjFormField());
         idField.setFocusTraversable(true);
 
+        DataTable.refreshTable();
+
     }
 
-    public static ObservableList<TheLoai> search(){
-        return TheLoaiBLL.get(getObjFormField());
+    public static void search(){
+        DataTable.setItems(TheLoaiBLL.get(getObjFormField()));
     }
 
     public static void update(){
         TheLoaiBLL.update(getObjFormField());
         MyDialog.showDialog("Update",null,"Update Success",MyDialog.INFO);
+        DataTable.refreshTable();
     }
 }

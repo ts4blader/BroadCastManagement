@@ -189,6 +189,13 @@ public class DataTable extends VBox {
 
     }
 
+    public static void refreshTable(){
+        tableView.setItems(KenhTVBLL.getAll());
+    }
+
+    public static void setItems(ObservableList<KenhTV> items){
+        tableView.setItems(items);
+    }
     //====================== Controller ======================
 
     public static void delete(){
@@ -198,6 +205,7 @@ public class DataTable extends VBox {
             MyDialog.showDialog("Non Selected Item",null, "Select an Item Pls",MyDialog.ERRO);
         for(KenhTV item : list)
             KenhTVBLL.delete(item);
+        refreshTable();
 
     }
 
@@ -207,7 +215,7 @@ public class DataTable extends VBox {
         for(KenhTV item : list)
             KenhTVBLL.delete(item);
         MyDialog.showDialog("Delete Success",null, "Done!", MyDialog.INFO);
-
+        refreshTable();
     }
 
 }

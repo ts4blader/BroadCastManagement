@@ -24,6 +24,7 @@ public class QuocGiaBLL {
 
     public static ObservableList<QuocGia> get(QuocGia quocGia){
 
+        quocGia.setMaQuocGia("");
         return FXCollections.observableArrayList(dao.getByObj(quocGia));
     }
 

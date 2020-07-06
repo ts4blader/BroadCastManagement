@@ -237,15 +237,16 @@ public class InputField extends VBox {
         if(!validator()) return;
         NhaSXBLL.save(getObjFormField());
         idField.setFocusTraversable(true);
-
+        DataTable.refreshTable();
     }
 
-    public static ObservableList<NhaSX> search(){
-        return NhaSXBLL.get(getObjFormField());
+    public static void search(){
+        DataTable.setItems(NhaSXBLL.get(getObjFormField()));
     }
 
     public static void update(){
         NhaSXBLL.update(getObjFormField());
+        DataTable.refreshTable();
         MyDialog.showDialog("Update",null,"Update Success",MyDialog.INFO);
     }
 }

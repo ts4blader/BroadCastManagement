@@ -24,6 +24,7 @@ public class ChuongTrinhBLL {
 
     public static ObservableList<ChuongTrinh> get(ChuongTrinh chuongTrinh){
 
+        chuongTrinh.setMaCT("");
         return FXCollections.observableArrayList(dao.getByObj(chuongTrinh));
     }
 

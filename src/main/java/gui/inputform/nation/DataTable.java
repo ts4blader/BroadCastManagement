@@ -1,7 +1,9 @@
 package gui.inputform.nation;
 
+import bll.KenhTVBLL;
 import bll.QuocGiaBLL;
 import bll.TheLoaiBLL;
+import dto.KenhTV;
 import dto.QuocGia;
 import dto.TheLoai;
 import gui.inputform.nation.InputField;
@@ -116,6 +118,14 @@ public class DataTable extends VBox {
 
     }
 
+    public static void refreshTable(){
+        tableView.setItems(QuocGiaBLL.getAll());
+    }
+
+    public static void setItems(ObservableList<QuocGia> items){
+        tableView.setItems(items);
+    }
+
     //====================== Controller ======================
 
     public void createButton(){
@@ -139,7 +149,7 @@ public class DataTable extends VBox {
             MyDialog.showDialog("Non Selected Item",null, "Select an Item Pls",MyDialog.ERRO);
         for(QuocGia item : list)
             QuocGiaBLL.delete(item);
-
+        refreshTable();
     }
 
     public static void deleteAll(){
@@ -147,7 +157,7 @@ public class DataTable extends VBox {
         ObservableList<QuocGia> list = tableView.getItems();
         for(QuocGia item : list)
             QuocGiaBLL.delete(item);
+        refreshTable();
         MyDialog.showDialog("Delete Success",null, "Done!", MyDialog.INFO);
-
     }
 }

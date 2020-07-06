@@ -1,13 +1,7 @@
 package gui.inputform.program;
 
-import bll.QuocGiaBLL;
-import bll.TheLoaiBLL;
-import bll.NhaSXBLL;
-import bll.ChuongTrinhBLL;
-import dto.ChuongTrinh;
-import dto.NhaSX;
-import dto.QuocGia;
-import dto.TheLoai;
+import bll.*;
+import dto.*;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.ObservableList;
 import utilities.ImageGetter;
@@ -213,6 +207,14 @@ public class DataTable extends VBox {
 
     }
 
+    public static void refreshTable(){
+        tableView.setItems(ChuongTrinhBLL.getAll());
+    }
+
+    public static void setItems(ObservableList<ChuongTrinh> items){
+        tableView.setItems(items);
+    }
+
     //====================== Controller ======================
 
     public void createButton(){
@@ -236,6 +238,7 @@ public class DataTable extends VBox {
             MyDialog.showDialog("Non Selected Item",null, "Select an Item Pls",MyDialog.ERRO);
         for(ChuongTrinh item : list)
             ChuongTrinhBLL.delete(item);
+        refreshTable();
 
     }
 
@@ -244,6 +247,7 @@ public class DataTable extends VBox {
         ObservableList<ChuongTrinh> list = tableView.getItems();
         for(ChuongTrinh item : list)
             ChuongTrinhBLL.delete(item);
+        refreshTable();
         MyDialog.showDialog("Delete Success",null, "Done!", MyDialog.INFO);
 
     }

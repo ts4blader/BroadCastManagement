@@ -170,14 +170,17 @@ public class InputField extends VBox {
         QuocGiaBLL.save(getObjFormField());
         idField.setFocusTraversable(true);
 
+        DataTable.refreshTable();
+
     }
 
-    public static ObservableList<QuocGia> search(){
-        return QuocGiaBLL.get(getObjFormField());
+    public static void search(){
+        DataTable.setItems(QuocGiaBLL.get(getObjFormField()));
     }
 
     public static void update(){
         QuocGiaBLL.update(getObjFormField());
+        DataTable.refreshTable();
         MyDialog.showDialog("Update",null,"Update Success",MyDialog.INFO);
     }
 }

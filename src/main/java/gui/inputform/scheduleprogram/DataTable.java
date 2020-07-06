@@ -237,6 +237,14 @@ public class DataTable extends VBox {
 
     }
 
+    public static void refreshTable(){
+        tableView.setItems(LichPhatSongBLL.getAll());
+    }
+
+    public static void setItems(ObservableList<LichPhatSong> items){
+        tableView.setItems(items);
+    }
+
     //====================== Controller ======================
 
     public void createButton(){
@@ -260,6 +268,7 @@ public class DataTable extends VBox {
             MyDialog.showDialog("Non Selected Item",null, "Select an Item Pls",MyDialog.ERRO);
         for(LichPhatSong item : list)
             LichPhatSongBLL.delete(item);
+        refreshTable();
 
     }
 
@@ -268,6 +277,7 @@ public class DataTable extends VBox {
         ObservableList<LichPhatSong> list = tableView.getItems();
         for(LichPhatSong item : list)
             LichPhatSongBLL.delete(item);
+        refreshTable();
         MyDialog.showDialog("Delete Success",null, "Done!", MyDialog.INFO);
 
     }

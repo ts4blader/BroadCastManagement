@@ -26,6 +26,7 @@ public class KenhTVBLL {
 
     public static ObservableList<KenhTV> get(KenhTV kenhTV){
 
+        kenhTV.setMaKenh("");
         return FXCollections.observableArrayList(dao.getByObj(kenhTV));
     }
 

@@ -23,6 +23,7 @@ public class LinhVucBLL {
 
     public static ObservableList<LinhVuc> get(LinhVuc linhVuc){
 
+        linhVuc.setMaLinhVuc("");
         return FXCollections.observableArrayList(dao.getByObj(linhVuc));
     }
 

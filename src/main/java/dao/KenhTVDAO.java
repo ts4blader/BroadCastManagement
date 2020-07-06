@@ -59,6 +59,13 @@ public class KenhTVDAO implements IDAO<KenhTV>{
 	public boolean save(KenhTV t) {
 		try {
 			rowSet.moveToInsertRow();
+			System.out.println(t.getStringBySTT(1));
+			System.out.println(t.getStringBySTT(2));
+
+			System.out.println(t.getStringBySTT(3));
+			System.out.println(t.getStringBySTT(4));
+			System.out.println(t.getIntBySTT(5));
+
 			rowSet.updateString("makenh", t.getMaKenh());
 			rowSet.updateString("tenkenh", t.getTenKenh());
 			rowSet.updateString("tinhTP", t.getTinhTP());

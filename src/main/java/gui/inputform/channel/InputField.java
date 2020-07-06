@@ -262,14 +262,16 @@ public class InputField extends VBox {
         KenhTVBLL.save(getObjFormField());
         idField.setFocusTraversable(true);
 
+        DataTable.refreshTable();
     }
 
-    public static ObservableList<KenhTV> search(){
-        return KenhTVBLL.get(getObjFormField());
+    public static void search(){
+        DataTable.setItems(KenhTVBLL.get(getObjFormField()));
     }
 
     public static void update(){
         KenhTVBLL.update(getObjFormField());
+        DataTable.refreshTable();
         MyDialog.showDialog("Update",null,"Update Success",MyDialog.INFO);
     }
 }

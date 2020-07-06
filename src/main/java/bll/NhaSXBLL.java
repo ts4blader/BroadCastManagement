@@ -24,6 +24,7 @@ public class NhaSXBLL {
 
     public static ObservableList<NhaSX> get(NhaSX nhaSX){
 
+        nhaSX.setMaNSX("");
         return FXCollections.observableArrayList(dao.getByObj(nhaSX));
     }
 
