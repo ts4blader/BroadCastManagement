@@ -1,14 +1,17 @@
 package gui.inputform.producer;
 
 
-import bll.CategoryBLL;
-import bll.NationBLL;
+import bll.KenhTVBLL;
+import bll.NhaSXBLL;
+import bll.TheLoaiBLL;
+import bll.QuocGiaBLL;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXTextField;
-import entities.Category;
-import entities.Nation;
-import entities.Producer;
+import dto.NhaSX;
+import dto.QuocGia;
+import dto.TheLoai;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.input.KeyCode;
@@ -29,24 +32,24 @@ public class InputField extends VBox {
     private static JFXTextField nameField;
 
     private HBox nationField;
-    private static JFXComboBox<Nation> nationSelector;
+    private static JFXComboBox<QuocGia> nationSelector;
     private JFXTextField nationName;
 
     private HBox buttonBar;
 
-    private JFXButton addBtn;
-    private JFXButton clearBtn;
-    private JFXButton searchBtn;
+    private static JFXButton addBtn;
+    private static JFXButton clearBtn;
+    private static JFXButton searchBtn;
+    private static JFXButton updateBtn;
 
 
     public InputField() {
 
         idField = MyLayout.getTextField("ID");
-        idField.setOnAction(e -> addProducer());
-        MyLayout.setValidator(idField, "Not match Requirement");
+        idField.setDisable(true);
+        idField.setText(setAutoID());
 
         nameField = MyLayout.getTextField("Name");
-        nameField.setOnAction(e -> addProducer());
         MyLayout.setValidator(nameField, "Not match Requirement");
 
         //====================== Nation Field ======================
@@ -56,6 +59,10 @@ public class InputField extends VBox {
         //====================== Button Bar ======================
 
         buttonBar = getButtonBar();
+
+        //====================== Set All Action ======================
+
+        setAction();
 
         //================ main layout =============
 
@@ -93,31 +100,32 @@ public class InputField extends VBox {
 
         nationSelector = getNationSelector();
         nationSelector.setPrefHeight(MyLayout.INPUT_HEIGHT);
+        nationSelector.prefWidthProperty().bind(this.widthProperty().multiply(0.6));
 
         nationName = MyLayout.getSubTextField("Nation ID");
         nationName.setDisable(true);
         nationName.prefWidthProperty().bind(this.widthProperty().multiply(MyLayout.NAME_FIELD));
 
-        hBox = new HBox(15);
+        hBox = new HBox(10);
         hBox.getChildren().addAll(nationSelector, nationName);
 
         return hBox;
     }
 
-    public JFXComboBox<Nation> getNationSelector() {
+    public JFXComboBox<QuocGia> getNationSelector() {
 
-        JFXComboBox<Nation> comboBox;
+        JFXComboBox<QuocGia> comboBox;
 
         comboBox = new JFXComboBox<>();
         comboBox.setPromptText("Nation");
         comboBox.setLabelFloat(true);
         comboBox.prefWidthProperty().bind(this.widthProperty().multiply(0.5));
-        comboBox.setItems(NationBLL.getAllNation());
+        comboBox.setItems(QuocGiaBLL.getAll());
 
-        comboBox.setOnAction(e -> nationName.setText(comboBox.getValue().getId()));
+        comboBox.setOnAction(e -> nationName.setText(comboBox.getValue().getMaQuocGia()));
         comboBox.setOnKeyPressed(e -> {
             if (e.getCode() == KeyCode.ENTER)
-                addProducer();
+                save();
         });
 
         return comboBox;
@@ -128,46 +136,33 @@ public class InputField extends VBox {
         HBox hBox;
 
         addBtn = MyLayout.getJFXButton("Add", ImageGetter.ADD, MyLayout.ICON_SIZE);
-        addBtn.setOnAction(e -> addProducer());
+        addBtn.setOnAction(e -> save());
+
         clearBtn = MyLayout.getJFXButton("Clear", ImageGetter.CLEAR, MyLayout.ICON_SIZE);
         clearBtn.setOnAction(e -> clearInput());
-        searchBtn = MyLayout.getJFXButton("Search", ImageGetter.SEARCH, MyLayout.ICON_SIZE);
 
+        searchBtn = MyLayout.getJFXButton("Search", ImageGetter.SEARCH, MyLayout.ICON_SIZE);
+        searchBtn.setOnAction(e -> search());
+
+        updateBtn = MyLayout.getJFXButton("Update", ImageGetter.SAVE, MyLayout.ICON_SIZE);
+        updateBtn.setOnAction(e -> update());
 
         //add to Button Bar
-        hBox = new HBox(15);
+        hBox = new HBox(10);
         hBox.setAlignment(Pos.CENTER);
-        hBox.getChildren().addAll(addBtn, clearBtn, searchBtn);
+        hBox.getChildren().addAll(addBtn, clearBtn, searchBtn, updateBtn);
 
 
         return hBox;
 
     }
 
-    public boolean addProducer() {
-        try {
-            if (!validatorCategory()) return false;
-
-            String id = idField.getText().trim();
-            String name = nameField.getText().trim();
-
-            CategoryBLL.addCategory(new Category(id, name));
-            return true;
-
-        } catch (Exception e) {
-            MyDialog.showDialog("Can not Add Program", "Unknow Error", e.getMessage(), MyDialog.ERRO);
-        } finally {
-            return false;
-        }
-
-    }
-
-    public static boolean setProducerFromTable(Producer producer){
+    public static boolean setNhaSXFromTable(NhaSX nhaSX){
 
         try {
-             idField.setText(producer.getId());
-             nameField.setText(producer.getName());
-             nationSelector.setValue(NationBLL.getNationById(producer.getNationID()));
+             idField.setText(nhaSX.getMaNSX());
+             nameField.setText(nhaSX.getTenNSX());
+             nationSelector.setValue(QuocGiaBLL.get(nhaSX.getMaQuocGia()));
 
              return true;
         }catch (Exception e){
@@ -180,9 +175,9 @@ public class InputField extends VBox {
 
     public boolean clearInput() {
         try {
-            idField.setText("");
+            idField.setText(setAutoID());
             nameField.setText("");
-            nationSelector.setValue(new Nation());
+            nationSelector.setValue(new QuocGia());
             return true;
         } catch (Exception e) {
             MyDialog.showDialog("Clear Input", "Clear Error", e.getMessage(), MyDialog.ERRO);
@@ -190,5 +185,67 @@ public class InputField extends VBox {
             return false;
         }
     }
-    //====================== End =================================
+
+    public static NhaSX getObjFormField(){
+
+        String id = idField.getText().trim();
+        String name = nameField.getText().trim();
+        String nationID = nationSelector.getValue().getMaQuocGia();
+
+        return new NhaSX(id, name, nationID);
+
+    }
+
+    public void setAction(){
+
+        nameField.setOnKeyPressed(e -> {
+            if(e.getCode() == KeyCode.ENTER)
+                save();
+        });
+        nationSelector.setOnKeyPressed(e -> {
+            if(e.getCode() == KeyCode.ENTER)
+                save();
+        });
+
+
+    }
+
+    //====================== Controller ======================
+
+    public static String setAutoID(){
+
+        int rows = NhaSXBLL.getRowNumber();
+        rows++;
+        if(rows/10 > 1 && rows/10 < 10) return "sx0" + String.valueOf(rows);
+        else if(rows/10 < 1) return "sx00" + String.valueOf(rows);
+        else return "sx" + String.valueOf(rows);
+
+    }
+
+    public static boolean validator() {
+
+        if (nameField.getText().equals("")) {
+            MyDialog.showDialog("Input requirement", null, "Name not Null", MyDialog.ERRO);
+            return false;
+        }
+
+        return true;
+    }
+
+    public static void save() {
+
+        if(!validator()) return;
+        NhaSXBLL.save(getObjFormField());
+        idField.setFocusTraversable(true);
+
+    }
+
+    public static ObservableList<NhaSX> search(){
+        return NhaSXBLL.get(getObjFormField());
+    }
+
+    public static void update(){
+        NhaSXBLL.update(getObjFormField());
+        MyDialog.showDialog("Update",null,"Update Success",MyDialog.INFO);
+    }
 }

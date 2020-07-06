@@ -3,24 +3,22 @@ package utilities;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextField;
 import com.jfoenix.validation.RequiredFieldValidator;
-import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Tab;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.HBox;
 import javafx.scene.text.Font;
 
 import java.io.File;
-import java.util.HashMap;
 
 public class MyLayout {
+    //====================== Common Variable ======================
 
     public final static int ICON_SIZE = 15;
     public final static int FONT_SIZE = 16;
     public final static int SUB_FONT_SIZE = 14;
     public final static int INPUT_HEIGHT = 30;
-    public final static double DIVIDER = 0.4;
+    public final static double DIVIDER = 0.45;
 
     public final static double NAME_FIELD = 0.4;
     public final static double SELECTOR_FIELD = 0.6;
@@ -28,6 +26,27 @@ public class MyLayout {
     public final static int SPACE = 10;
     public final static int NORMAL_SPACE = 25;
     public final static int BIG_SPACE = 40;
+
+    //====================== String pattern ======================
+    public final static String DATE = "\\d{1,2}[-|/]\\d{1,2}[-|/]\\d{4}";
+    public final static String PEOPLENAME = "[a-zA-Z|\\s]*";
+    public final static String NUMBER = "\\d*";
+    //id
+    public final static String CATEGORYID = "CT\\d{1,3}";
+    public final static String PROGRAMID = "PG\\d{1,3}";
+    public final static String CHANNELID = "CN\\d{1,3}";
+    public final static String NATIONID = "NT\\d{1,3}";
+    public final static String PRODUCERID = "PD\\d{1,3}";
+    public final static String PRODUCER = "PD\\d{1,3}";
+    public final static String SCHEDULEID = "SC\\d{1,3}";
+    //hour
+    public final static String HOUR = "\\d{1,2}";
+    public final static String MINUTE = "\\d{1,2}";
+
+
+
+
+    //====================== Day of Week ======================
 
     public final static String[] dayOfWeek = {
             "Mon", "Tue", "Web", "Thu", "Fri", "Sat", "Sun"

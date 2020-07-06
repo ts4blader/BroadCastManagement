@@ -1,90 +1,97 @@
 package gui.inputform.scheduleprogram;
 
 import bll.*;
-import entities.*;
+import dto.ChuongTrinh;
+import dto.KenhTV;
+import dto.LichPhatSong;
+import dto.QuocGia;
+import gui.inputform.scheduleprogram.InputField;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.util.Callback;
 import utilities.ImageGetter;
+import utilities.MyDialog;
 import utilities.MyLayout;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.ArrayList;
 
 public class DataTable extends VBox {
 
 
     //TableView
-    private TableView<ScheduleProgram> tableView;
-    //Program col
-    private TableColumn<ScheduleProgram, Program> programCol;
-    //Channel Col
-    private TableColumn<ScheduleProgram, Channel> channelCol;
-    //Time Col
-    private TableColumn<ScheduleProgram, LocalTime> timeCol;
-    //Day Of Week Col
-    private TableColumn<ScheduleProgram, Boolean> monCol;
-    private TableColumn<ScheduleProgram, Boolean> tuesCol;
-    private TableColumn<ScheduleProgram, Boolean> wedCol;
-    private TableColumn<ScheduleProgram, Boolean> thusCol;
-    private TableColumn<ScheduleProgram, Boolean> friCol;
-    private TableColumn<ScheduleProgram, Boolean> satCol;
-    private TableColumn<ScheduleProgram, Boolean> sunCol;
+    private static TableView<LichPhatSong> tableView;
+    //ChuongTrinh col
+    private static TableColumn<LichPhatSong, ChuongTrinh> chuongTrinhCol;
+    //KenhTV Col
+    private static TableColumn<LichPhatSong, KenhTV> kenhCol;
     //Duration Col
-    private TableColumn<ScheduleProgram, Integer> durationCol;
+    private static TableColumn<LichPhatSong, Integer> durationCol;
     //Chapter Col
-    private TableColumn<ScheduleProgram, Integer> chapterCol;
+    private static TableColumn<LichPhatSong, Integer> chapterCol;
+    //day col
+    private static TableColumn<LichPhatSong, Integer> dayCol;
+    //month col
+    private static TableColumn<LichPhatSong, Integer> monthCol;
+    //hour col
+    private static TableColumn<LichPhatSong, Integer> hourCol;
+    //minute col
+    private static TableColumn<LichPhatSong, Integer> minuteCol;
+    //day of week col
+    private static TableColumn<LichPhatSong, String> dayOfWeekCol;
+    //Broad Time
+    private static TableColumn<LichPhatSong, Integer> broadTimeCol;
     //Button Bar
-    private HBox buttonBar;
+    private static HBox buttonBar;
     //Buttons
-    private Button saveBtn;
-    private Button undoBtn;
-    private Button redoBtn;
-    private Button deleteBtn;
-    private Button deleteAllBtn;
+    private static Button refreshBtn;
+    private static Button deleteBtn;
+    private static Button deleteAllBtn;
 
 
     public DataTable() {
 
-        //====================== Program Coll ======================
+        //====================== ChuongTrinh Col ======================
 
-        programCol = getProgramCol();
+        chuongTrinhCol = getChuongTrinhCol();
 
-        //====================== Channel col ======================
+        //====================== KenhTV col ======================
 
-        channelCol = getChannelCol();
+        kenhCol = getKenhCol();
+
+        //====================== Date Col ======================
+
+        createDateCol();
 
         //====================== Time Col ======================
 
-        timeCol = getTimeCol();
+        createTimeCol();
 
-        //====================== MonDay Col ======================
-        int i = 0;
-        monCol = getDayOfWeekCol(i++, "2");
-        tuesCol = getDayOfWeekCol(i++, "3");
-        wedCol = getDayOfWeekCol(i++, "4");
-        thusCol = getDayOfWeekCol(i++, "5");
-        friCol = getDayOfWeekCol(i++, "6");
-        satCol = getDayOfWeekCol(i++, "7");
-        sunCol = getDayOfWeekCol(i++, "CN");
+        //====================== Day Of Week Col ======================
+
+        dayOfWeekCol = getStringCol("DOW", "thu");
 
         //====================== Duration Col ======================
 
-        durationCol = getTextCol("Duration", "duration");
+        durationCol = getTextCol("Duration", "thoiLuong");
 
         //====================== Chapter Col ======================
 
-        chapterCol = getTextCol("Chapter","chapter");
+        chapterCol = getTextCol("Chapter", "ky_Tap");
+
+        //====================== Broad Time ======================
+
+        broadTimeCol = getTextCol("Broad Time", "lanPhatSong");
 
         //====================== TableView ======================
 
@@ -100,9 +107,27 @@ public class DataTable extends VBox {
 
     }
 
-    public TableColumn<ScheduleProgram, Integer> getTextCol(String text, String property) {
+    public void createDateCol() {
 
-        TableColumn<ScheduleProgram, Integer> tableColumn;
+        dayCol = getTextCol("Day", "ngay");
+
+        monthCol = getTextCol("Month","thang");
+
+
+    }
+
+    public void createTimeCol() {
+
+        hourCol = getTextCol("Hour", "gio");
+
+        minuteCol = getTextCol("Minute","phut");
+
+
+    }
+
+    public TableColumn<LichPhatSong, Integer> getTextCol(String text, String property) {
+
+        TableColumn<LichPhatSong, Integer> tableColumn;
         tableColumn = new TableColumn<>(text);
 
         tableColumn.setCellValueFactory(new PropertyValueFactory<>(property));
@@ -112,17 +137,51 @@ public class DataTable extends VBox {
         return tableColumn;
     }
 
-    public TableColumn<ScheduleProgram, Program> getProgramCol() {
+    public TableColumn<LichPhatSong, String> getStringCol(String text, String property) {
 
-        TableColumn<ScheduleProgram, Program> tableColumn;
-        tableColumn = new TableColumn<>("Program");
+        TableColumn<LichPhatSong, String> tableColumn;
+        tableColumn = new TableColumn<>(text);
 
-        tableColumn.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<ScheduleProgram, Program>, ObservableValue<Program>>() {
+        tableColumn.setCellValueFactory(new PropertyValueFactory<>(property));
+        tableColumn.setMinWidth(50);
+
+
+        return tableColumn;
+    }
+
+    public TableColumn<LichPhatSong, ChuongTrinh> getChuongTrinhCol() {
+        //Tao Column
+        TableColumn<LichPhatSong, ChuongTrinh> tableColumn;
+        tableColumn = new TableColumn<>("ChuongTrinh");
+        //Set Cach hien thi du lieu
+        tableColumn.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<LichPhatSong, ChuongTrinh>, ObservableValue<ChuongTrinh>>() {
             @Override
-            public ObservableValue<Program> call(TableColumn.CellDataFeatures<ScheduleProgram, Program> param) {
-                ScheduleProgram scheduleProgram = param.getValue();
+            public ObservableValue<ChuongTrinh> call(TableColumn.CellDataFeatures<LichPhatSong, ChuongTrinh> param) {
+                //Get Lich Phat Song
+                LichPhatSong LichPhatSong = param.getValue();
+                //Tra ve 1 Property la ma Chuong Trinh
+                return new SimpleObjectProperty<>(ChuongTrinhBLL.get(LichPhatSong.getMaCT()));
+            }
+        });
+        //Set do rong toi thieu
+        tableColumn.setMinWidth(100);
 
-                return new SimpleObjectProperty<>(ProgramBLL.getProgramById(scheduleProgram.getProgramID()));
+        return tableColumn;
+
+
+    }
+
+    public TableColumn<LichPhatSong, KenhTV> getKenhCol() {
+
+        TableColumn<LichPhatSong, KenhTV> tableColumn;
+        tableColumn = new TableColumn<>("KenhTV");
+
+        tableColumn.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<LichPhatSong, KenhTV>, ObservableValue<KenhTV>>() {
+            @Override
+            public ObservableValue<KenhTV> call(TableColumn.CellDataFeatures<LichPhatSong, KenhTV> param) {
+                LichPhatSong LichPhatSong = param.getValue();
+
+                return new SimpleObjectProperty<KenhTV>(KenhTVBLL.get(LichPhatSong.getMaKenh()));
             }
         });
 
@@ -131,105 +190,37 @@ public class DataTable extends VBox {
         return tableColumn;
 
 
-    }
-
-    public TableColumn<ScheduleProgram, Channel> getChannelCol() {
-
-        TableColumn<ScheduleProgram, Channel> tableColumn;
-        tableColumn = new TableColumn<>("Channel");
-
-        tableColumn.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<ScheduleProgram, Channel>, ObservableValue<Channel>>() {
-            @Override
-            public ObservableValue<Channel> call(TableColumn.CellDataFeatures<ScheduleProgram, Channel> param) {
-                ScheduleProgram scheduleProgram = param.getValue();
-
-                return new SimpleObjectProperty<Channel>(ChannelBLL.getChannelById(scheduleProgram.getChannelID()));
-            }
-        });
-
-        tableColumn.setMinWidth(100);
-
-        return tableColumn;
-
-
-    }
-
-    public TableColumn<ScheduleProgram, LocalTime> getTimeCol(){
-
-        TableColumn<ScheduleProgram, LocalTime> tableColumn = new TableColumn<>("Time");
-
-        tableColumn.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<ScheduleProgram, LocalTime>, ObservableValue<LocalTime>>() {
-            @Override
-            public ObservableValue<LocalTime> call(TableColumn.CellDataFeatures<ScheduleProgram, LocalTime> param) {
-                ScheduleProgram scheduleProgram = param.getValue();
-
-                return new SimpleObjectProperty<LocalTime>(scheduleProgram.getTime());
-
-            }
-        });
-        return tableColumn;
-    }
-
-    public TableColumn<ScheduleProgram, Boolean> getDayOfWeekCol(int index, String label){
-
-        TableColumn<ScheduleProgram, Boolean> tableColumn = new TableColumn<>(label);
-
-        tableColumn.getStyleClass().addAll("table-cell-center", "font-bold");
-        tableColumn.setMinWidth(20);
-        tableColumn.setPrefWidth(30);
-        tableColumn.setCellValueFactory( cellData -> cellData.getValue().getDayOfWeekProperty(index));
-
-        tableColumn.setCellFactory(column ->{
-            return new TableCell<ScheduleProgram, Boolean>(){
-                @Override
-                protected void updateItem(Boolean item, boolean empty) {
-                    if(item == null || empty)
-                        setText("");
-                    else
-                        if(item == true) setText("+");
-                        else  setText("-");
-                }
-            };
-        });
-
-        return tableColumn;
     }
 
     public HBox getButtonBar() {
 
         HBox hBox = new HBox(MyLayout.SPACE);
 
-        saveBtn = MyLayout.getButton("Save", ImageGetter.SAVE, MyLayout.ICON_SIZE);
-
-        redoBtn = MyLayout.getButton("Redo", ImageGetter.REDO, MyLayout.ICON_SIZE);
-
-        undoBtn = MyLayout.getButton("Undo", ImageGetter.UNDO, MyLayout.ICON_SIZE);
-
-        deleteBtn = MyLayout.getButton("Delete", ImageGetter.DELETE, MyLayout.ICON_SIZE);
-
-        deleteAllBtn = MyLayout.getButton("Delete All", ImageGetter.DELETE, MyLayout.ICON_SIZE);
+        createButton();
 
         hBox.setAlignment(Pos.CENTER);
-        hBox.getChildren().addAll(saveBtn, undoBtn, redoBtn, deleteBtn, deleteAllBtn);
+        hBox.getChildren().addAll(refreshBtn, deleteBtn, deleteAllBtn);
 
         return hBox;
 
     }
 
-    public TableView<ScheduleProgram> getTableView() {
+    public TableView<LichPhatSong> getTableView() {
 
-        TableView<ScheduleProgram> tableView = new TableView<>();
+        TableView<LichPhatSong> tableView = new TableView<>();
 
-        tableView.setItems(ScheduleProgramBLL.getAllSchedule());
+        tableView.setItems(LichPhatSongBLL.getAll());
         tableView.setMinHeight(450);
         tableView.setEditable(true);
         tableView.prefHeightProperty().bind(this.heightProperty().divide(5.5 / 4.5));
-        tableView.getColumns().addAll(programCol, channelCol, monCol, tuesCol,
-                wedCol, thusCol, friCol, satCol, sunCol, timeCol, durationCol, chapterCol);
-        tableView.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<ScheduleProgram>() {
+        tableView.getColumns().addAll(chuongTrinhCol, kenhCol, dayOfWeekCol,
+                dayCol, monthCol,
+                hourCol, minuteCol
+                ,durationCol, broadTimeCol, chapterCol);
+        tableView.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<LichPhatSong>() {
             @Override
-            public void changed(ObservableValue<? extends ScheduleProgram> observable, ScheduleProgram oldValue, ScheduleProgram newValue) {
-                if(tableView.getSelectionModel().getSelectedItem() != null){
+            public void changed(ObservableValue<? extends LichPhatSong> observable, LichPhatSong oldValue, LichPhatSong newValue) {
+                if (tableView.getSelectionModel().getSelectedItem() != null) {
                     InputField.setScheduleFromTable(newValue);
                 }
             }
@@ -243,6 +234,41 @@ public class DataTable extends VBox {
         this.setSpacing(20);
         this.getChildren().addAll(tableView, buttonBar);
 
+
+    }
+
+    //====================== Controller ======================
+
+    public void createButton(){
+
+
+        deleteBtn = MyLayout.getButton("Delete", ImageGetter.DELETE, MyLayout.ICON_SIZE);
+        deleteBtn.setOnAction(e -> delete());
+
+        deleteAllBtn = MyLayout.getButton("Delete All", ImageGetter.DELETE, MyLayout.ICON_SIZE);
+        deleteAllBtn.setOnAction(e -> deleteAll());
+
+        refreshBtn = MyLayout.getButton("Refresh", ImageGetter.REFRESH, MyLayout.ICON_SIZE);
+        refreshBtn.setOnAction(e -> tableView.setItems(LichPhatSongBLL.getAll()));
+
+    }
+
+    public static void delete(){
+
+        ObservableList<LichPhatSong> list = tableView.getSelectionModel().getSelectedItems();
+        if(list == null)
+            MyDialog.showDialog("Non Selected Item",null, "Select an Item Pls",MyDialog.ERRO);
+        for(LichPhatSong item : list)
+            LichPhatSongBLL.delete(item);
+
+    }
+
+    public static void deleteAll(){
+
+        ObservableList<LichPhatSong> list = tableView.getItems();
+        for(LichPhatSong item : list)
+            LichPhatSongBLL.delete(item);
+        MyDialog.showDialog("Delete Success",null, "Done!", MyDialog.INFO);
 
     }
 }

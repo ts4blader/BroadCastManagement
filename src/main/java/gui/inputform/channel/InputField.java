@@ -1,24 +1,21 @@
 package gui.inputform.channel;
 
 
-import bll.ChannelBLL;
+import bll.KenhTVBLL;
+import bll.LinhVucBLL;
 import com.jfoenix.controls.*;
-import entities.Channel;
+import dto.KenhTV;
+import dto.LinhVuc;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.Label;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.scene.text.Text;
 import utilities.ImageGetter;
 import utilities.MyDialog;
 import utilities.MyLayout;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 
 public class InputField extends VBox {
     // Define const
@@ -31,50 +28,50 @@ public class InputField extends VBox {
 
     private static JFXCheckBox isCenterBox;
 
-    private VBox dateField;
-    private static JFXTextField beginDateField;
-    private Text exampleDate;
+    private static HBox majorField;
+    private static JFXComboBox<LinhVuc> majorComboxBox;
+    private static JFXTextField majorName;
 
     private static JFXTextField cityField;
 
-    private HBox buttonBar;
+    private static HBox buttonBar;
 
-    private JFXButton addBtn;
-    private JFXButton clearBtn;
-    private JFXButton searchBtn;
+    private static JFXButton addBtn;
+    private static JFXButton clearBtn;
+    private static JFXButton searchBtn;
+    private static JFXButton updateBtn;
 
 
     public InputField() {
 
         idField = MyLayout.getTextField("ID");
-        idField.setOnAction( e -> addChannel());
-        MyLayout.setValidator(idField, "Not match Requirement");
+        idField.setText(setAutoID());
+        idField.setDisable(true);
 
         nameField = MyLayout.getTextField("Name");
-        nameField.setOnAction(e -> addChannel());
+        nameField.setOnAction(e -> save());
         MyLayout.setValidator(nameField, "Not match Requirement");
 
 
         //====================== isCenter Box ======================
 
         isCenterBox = getCheckBox("Is Center?");
-        isCenterBox.setOnKeyPressed( e ->{
-            if( e.getCode() == KeyCode.ENTER)
-                addChannel();
-        });
-
-        //================= Date Field ===================
-
-        createDateField();
 
         //============== City Field ==================
 
         cityField = MyLayout.getTextField("City");
-        cityField.setOnAction(e -> addChannel());
+
+        //====================== Major ======================
+
+        majorField = getMajorField();
 
         //====================== Button Bar ======================
 
         buttonBar = getButtonBar();
+
+        //====================== Set All Action ======================
+
+        setAction();
 
         //================ main layout =============
 
@@ -89,7 +86,7 @@ public class InputField extends VBox {
         this.setPadding(new Insets(30));
         this.setSpacing(40);
         this.setAlignment(Pos.CENTER_LEFT);
-        this.getChildren().addAll(idField, nameField, isCenterBox, dateField, cityField, buttonBar);
+        this.getChildren().addAll(idField, nameField, isCenterBox,majorField, cityField, buttonBar);
 
     }
 
@@ -102,23 +99,51 @@ public class InputField extends VBox {
 
     }
 
-    public boolean validatorProgram() {
-        if (idField.getText().equals("")){
-            MyDialog.showDialog("Input requirement", null, "ID not match Requirement", MyDialog.ERRO);
-            return false;
-        }
+    public JFXComboBox<LinhVuc> getMajorComboBox() {
+
+        JFXComboBox<LinhVuc> comboBox;
+
+        comboBox = new JFXComboBox<>();
+        comboBox.setPromptText("Linh Vuc");
+        comboBox.setLabelFloat(true);
+        comboBox.prefWidthProperty().bind(this.widthProperty().multiply(MyLayout.SELECTOR_FIELD));
+        comboBox.setItems(LinhVucBLL.getAll());
+
+        comboBox.setOnAction(e -> majorName.setText(comboBox.getValue().getTenLinhVuc()));
+        comboBox.setOnKeyPressed(e -> {
+            if (e.getCode() == KeyCode.ENTER)
+                save();
+        });
+
+        return comboBox;
+    }
+
+    public HBox getMajorField() {
+
+        HBox hBox;
+
+        majorComboxBox = getMajorComboBox();
+        majorComboxBox.setPrefHeight(MyLayout.INPUT_HEIGHT);
+        majorComboxBox.prefWidthProperty().bind(this.widthProperty().multiply(0.6));
+
+        majorName = MyLayout.getSubTextField("Nha SX ID");
+        majorName.setDisable(true);
+        majorName.prefWidthProperty().bind(this.widthProperty().multiply(MyLayout.NAME_FIELD));
+
+        hBox = new HBox(15);
+        hBox.getChildren().addAll(majorComboxBox, majorName);
+
+        return hBox;
+
+    }
+
+    public static boolean validator() {
+
         if (nameField.getText().equals("")) {
-            MyDialog.showDialog("Input requirement", null, "Name not match Requirement", MyDialog.ERRO);
+            MyDialog.showDialog("Input requirement", null, "Name not Null", MyDialog.ERRO);
             return false;
         }
-        if (beginDateField.getText().matches("[0-9][1-9]/[0-9][1-9]/[1-9][0-9]{1,3}")) {
-            MyDialog.showDialog("Input requirement", null, "Category not null", MyDialog.ERRO);
-            return false;
-        }
-        if (cityField.getText().equals("")) {
-            MyDialog.showDialog("Input requirement", null, "City not null", MyDialog.ERRO);
-            return false;
-        }
+
 
         return true;
     }
@@ -128,64 +153,33 @@ public class InputField extends VBox {
         HBox hBox;
 
         addBtn = MyLayout.getJFXButton("Add", ImageGetter.ADD, MyLayout.ICON_SIZE);
-        addBtn.setOnAction( e -> addChannel());
+        addBtn.setOnAction( e -> save());
+
         clearBtn = MyLayout.getJFXButton("Clear", ImageGetter.CLEAR, MyLayout.ICON_SIZE);
         clearBtn.setOnAction( e -> clearInput());
+
         searchBtn = MyLayout.getJFXButton("Search", ImageGetter.SEARCH, MyLayout.ICON_SIZE);
+        searchBtn.setOnAction(e -> search());
+
+        updateBtn = MyLayout.getJFXButton("Update", ImageGetter.SAVE, MyLayout.ICON_SIZE);
+        updateBtn.setOnAction(e -> update());
+
 
 
         //add to Button Bar
-        hBox = new HBox(15);
+        hBox = new HBox(10);
         hBox.setAlignment(Pos.CENTER);
-        hBox.getChildren().addAll(addBtn, clearBtn, searchBtn);
+        hBox.getChildren().addAll(addBtn, clearBtn, searchBtn, updateBtn);
 
 
         return hBox;
 
     }
 
-    public void createDateField(){
-
-        beginDateField = MyLayout.getTextField("Begin Date");
-        beginDateField.setOnAction( e -> addChannel());
-
-        exampleDate = new Text("Example: 07/04/1999, 07-04-1999");
-        exampleDate.setFill(Color.valueOf("#666"));
-        exampleDate.setFont(new Font(17));
-
-        dateField = new VBox(MyLayout.SPACE);
-        dateField.getChildren().addAll(beginDateField, exampleDate);
-
-    }
-
-    public boolean addChannel() {
-        try {
-            if (!validatorProgram()) return false;
-
-            String id = idField.getText().trim();
-            String name = nameField.getText().trim();
-            Boolean isCenter = isCenterBox.isSelected();
-            String beginDateString = beginDateField.getText();
-            LocalDate beginDate = LocalDate.parse(beginDateField.getText().trim(), DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-            String city = cityField.getText();
-            //Convert to date
-
-            ChannelBLL.add(new Channel(id, name, isCenter, beginDate, city));
-            return true;
-
-        } catch (Exception e) {
-            MyDialog.showDialog("Can not Add Program", "Unknow Error", e.getMessage(), MyDialog.ERRO);
-        } finally {
-            return false;
-        }
-
-    }
-
     public boolean clearInput() {
         try {
-            idField.setText("");
+            idField.setText(setAutoID());
             nameField.setText("");
-            beginDateField.setText("");
             cityField.setText("");
             isCenterBox.setSelected(false);
 
@@ -197,14 +191,21 @@ public class InputField extends VBox {
         }
     }
 
-    public static boolean setChannelFromTable(Channel channel){
+    public static boolean setObjFromTable(KenhTV channel){
 
         try {
-            idField.setText(channel.getId());
-            nameField.setText(channel.getName());
-            isCenterBox.setSelected(channel.isCenter());
-            cityField.setText(channel.getCity());
-            beginDateField.setText(DateTimeFormatter.ofPattern("dd/MM/yyyy").format(channel.getBeginDate()));
+            idField.setText(channel.getMaKenh());
+
+            nameField.setText(channel.getTenKenh());
+
+            if (channel.getThuocTU() == 1)
+                isCenterBox.setSelected(true);
+            else
+                isCenterBox.setSelected(false);
+
+            majorComboxBox.setValue(LinhVucBLL.get(channel.getMaLV()));
+
+            cityField.setText(channel.getTinhTP());
 
             return true;
         } catch (Exception e){
@@ -213,5 +214,62 @@ public class InputField extends VBox {
 
         return false;
     }
-    //====================== End =================================
+
+    public static KenhTV getObjFormField(){
+
+        String id = idField.getText().trim();
+        String name = nameField.getText().trim();
+        String city = cityField.getText().trim();
+        String majorID = majorComboxBox.getValue().getMaLinhVuc();
+        int isCenter = 0;
+        if(isCenterBox.isSelected())
+            isCenter = 1;
+
+        return new KenhTV(id, name, city, majorID, isCenter);
+    }
+
+    public void setAction(){
+
+        nameField.setOnAction(e -> save());
+        isCenterBox.setOnKeyPressed(e ->{
+            if(e.getCode() == KeyCode.ENTER)
+                save();
+        });
+        cityField.setOnKeyPressed(e ->{
+            if(e.getCode() == KeyCode.ENTER)
+                save();
+        });
+        majorComboxBox.setOnKeyPressed(e ->{
+            if(e.getCode() == KeyCode.ENTER)
+                save();
+        });
+    }
+    //====================== Controller ======================
+
+    public static String setAutoID(){
+
+        int rows = KenhTVBLL.getRowNumber();
+        rows++;
+        if(rows/10 > 1 && rows/10 < 10) return "tv0" + String.valueOf(rows);
+        else if(rows/10 < 1) return "tv00" + String.valueOf(rows);
+        else return "tv" + String.valueOf(rows);
+
+    }
+
+    public static void save() {
+
+        if(!validator()) return;
+        KenhTVBLL.save(getObjFormField());
+        idField.setFocusTraversable(true);
+
+    }
+
+    public static ObservableList<KenhTV> search(){
+        return KenhTVBLL.get(getObjFormField());
+    }
+
+    public static void update(){
+        KenhTVBLL.update(getObjFormField());
+        MyDialog.showDialog("Update",null,"Update Success",MyDialog.INFO);
+    }
 }

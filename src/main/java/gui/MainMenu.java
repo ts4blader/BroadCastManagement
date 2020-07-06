@@ -1,5 +1,6 @@
 package gui;
 
+import gui.inputform.MainForm;
 import utilities.ImageGetter;
 import com.jfoenix.controls.JFXButton;
 import javafx.application.Application;
@@ -13,6 +14,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import utilities.MyDialog;
 
 import java.io.File;
 
@@ -20,27 +22,27 @@ import java.io.File;
 public class MainMenu extends Application {
 
 
-    private VBox mainLayout;
+    private static VBox mainLayout;
 //    top Pane
-    private VBox topPane;
+    private static VBox topPane;
 //    mid Pane
-    private HBox midPane;
-    private JFXButton inputBtn;
-    private JFXButton advancedBtn;
-    private JFXButton updateBtn;
-    private JFXButton exitBtn;
+    private static HBox midPane;
+    private static JFXButton inputBtn;
+    private static JFXButton advancedBtn;
+    private static JFXButton updateBtn;
+    private static JFXButton reportBtn;
 //    Bot Pane
-    private HBox botPane;
+    private static HBox botPane;
     
-    private VBox devSection;
-    private Label devTitle;
-    private Label herobmdk;
-    private Label trisTran;
-    private Label nameLess;
+    private static VBox devSection;
+    private static Label devTitle;
+    private static Label herobmdk;
+    private static Label trisTran;
+    private static Label nameLess;
     
-    private HBox contactPane;
+    private static HBox contactPane;
 
-    
+    private static Stage main;
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -62,14 +64,19 @@ public class MainMenu extends Application {
         mainLayout = new VBox(topPane, botPane);
 
         Scene scene = new Scene(mainLayout);
-        File css = new File("src/main/java/GUI/style.css");
+        File css = new File("src/main/java/gui/style.css");
         scene.getStylesheets().add("file:///" + css.getAbsolutePath().replace("\\", "/"));
 
-        primaryStage.setTitle("BroadCast Management");
-        primaryStage.setMinWidth(800);
-        primaryStage.setScene(scene);
-        primaryStage.setResizable(false);
-        primaryStage.show();
+        main = primaryStage;
+        main.setTitle("BroadCast Management");
+        main.setMinWidth(800);
+        main.setScene(scene);
+        main.setResizable(false);
+        main.show();
+    }
+
+    public static void show(){
+        main.show();
     }
 
     public void creatTopPane(){
@@ -101,19 +108,20 @@ public class MainMenu extends Application {
 
         int iconSize = 80;
 
-        inputBtn = getButton("Input", ImageGetter.INPUT, iconSize);
+        inputBtn = getButton("Input", ImageGetter.KEYBOARD, iconSize);
+        inputBtn.setOnAction(e -> showMainForm());
 
         advancedBtn = getButton("Advanced", ImageGetter.DATABASE, iconSize);
 
-        updateBtn = getButton("Update", ImageGetter.EXCHANGE, iconSize);
+        updateBtn = getButton("Update", ImageGetter.UPDATE, iconSize);
 
-        exitBtn = getButton("Exit", ImageGetter.EXIT, iconSize);
+        reportBtn = getButton("Report", ImageGetter.REPORT, iconSize);
 
 
         midPane = new HBox(40);
         midPane.setAlignment(Pos.CENTER);
         midPane.getStyleClass().addAll("midPane");
-        midPane.getChildren().addAll(inputBtn, advancedBtn, updateBtn, exitBtn);
+        midPane.getChildren().addAll(inputBtn, advancedBtn, updateBtn, reportBtn);
 
 
     }
@@ -145,6 +153,17 @@ public class MainMenu extends Application {
         botPane.setPadding(new Insets(25));
         botPane.getChildren().addAll(devSection, contactPane);
 
+
+    }
+
+    public void showMainForm(){
+
+        try {
+            MainForm.start();
+            main.close();
+        } catch (Exception e){
+            MyDialog.showDialog("Error",null, "Unknow Error",MyDialog.ERRO);
+        }
 
     }
 }

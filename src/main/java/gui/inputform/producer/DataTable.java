@@ -1,14 +1,13 @@
 package gui.inputform.producer;
 
-import bll.CategoryBLL;
-import bll.NationBLL;
-import bll.ProducerBLL;
-import entities.Category;
-import entities.Nation;
-import entities.Producer;
+import bll.QuocGiaBLL;
+import bll.NhaSXBLL;
+import dto.NhaSX;
+import dto.QuocGia;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
@@ -18,6 +17,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.util.Callback;
 import utilities.ImageGetter;
+import utilities.MyDialog;
 import utilities.MyLayout;
 
 public class DataTable extends VBox {
@@ -25,38 +25,36 @@ public class DataTable extends VBox {
     public final static int ICON_SIZE = 15;
 
     //TableView
-    private TableView<Producer> tableView;
+    private static TableView<NhaSX> tableView;
     //ID Col
-    private TableColumn<Producer, String> idCol;
+    private static TableColumn<NhaSX, String> idCol;
     //Name Col
-    private TableColumn<Producer, String> nameCol;
-    //Nation Col
-    private TableColumn<Producer, Nation> nationCol;
+    private static TableColumn<NhaSX, String> nameCol;
+    //QuocGia Col
+    private static TableColumn<NhaSX, QuocGia> quocGiaCol;
     //Button Bar
-    private HBox buttonBar;
+    private static HBox buttonBar;
     //Buttons
-    private Button saveBtn;
-    private Button undoBtn;
-    private Button redoBtn;
-    private Button deleteBtn;
-    private Button deleteAllBtn;
+    private static Button deleteBtn;
+    private static Button deleteAllBtn;
+    private static Button refreshBtn;
 
 
     public DataTable() {
 
         //====================== ID Col ======================
 
-        idCol = getTextCol("#", "id");
+        idCol = getTextCol("#", "maNSX");
         idCol.setStyle("-fx-alignment: CENTER-RIGHT");
 
         //====================== Name Col ======================
 
-        nameCol = getTextCol("Name", "name");
+        nameCol = getTextCol("Name", "tenNSX");
         nameCol.setMinWidth(200);
 
-        //====================== Nation Col ======================
+        //====================== Quoc Gia ======================
 
-        createNationCol();
+        createQuocGiaCol();
 
         //====================== Button Bar ======================
 
@@ -72,9 +70,9 @@ public class DataTable extends VBox {
 
     }
 
-    public TableColumn<Producer, String> getTextCol(String text, String property) {
+    public TableColumn<NhaSX, String> getTextCol(String text, String property) {
 
-        TableColumn<Producer, String> tableColumn;
+        TableColumn<NhaSX, String> tableColumn;
         tableColumn = new TableColumn<>(text);
 
         tableColumn.setCellValueFactory(new PropertyValueFactory<>(property));
@@ -87,52 +85,44 @@ public class DataTable extends VBox {
 
         HBox hBox = new HBox(MyLayout.SPACE);
 
-        saveBtn = MyLayout.getButton("Save", ImageGetter.SAVE, MyLayout.ICON_SIZE);
-
-        redoBtn = MyLayout.getButton("Redo", ImageGetter.REDO, MyLayout.ICON_SIZE);
-
-        undoBtn = MyLayout.getButton("Undo", ImageGetter.UNDO, MyLayout.ICON_SIZE);
-
-        deleteBtn = MyLayout.getButton("Delete", ImageGetter.DELETE, MyLayout.ICON_SIZE);
-
-        deleteAllBtn = MyLayout.getButton("Delete All", ImageGetter.DELETE, MyLayout.ICON_SIZE);
+        createButton();
 
         hBox.setAlignment(Pos.CENTER);
-        hBox.getChildren().addAll(saveBtn, undoBtn, redoBtn, deleteBtn, deleteAllBtn);
+        hBox.getChildren().addAll(refreshBtn, deleteBtn, deleteAllBtn);
 
         return hBox;
 
     }
 
-    public void createNationCol(){
+    public void createQuocGiaCol(){
 
-        nationCol = new TableColumn<>("Nation");
-        nationCol.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Producer, Nation>, ObservableValue<Nation>>() {
+        quocGiaCol = new TableColumn<>("QuocGia");
+        quocGiaCol.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<NhaSX, QuocGia>, ObservableValue<QuocGia>>() {
             @Override
-            public ObservableValue<Nation> call(TableColumn.CellDataFeatures<Producer, Nation> param) {
+            public ObservableValue<QuocGia> call(TableColumn.CellDataFeatures<NhaSX, QuocGia> param) {
 
-                Producer producer = param.getValue();
-                 return new SimpleObjectProperty<>(NationBLL.getNationById(producer.getNationID()));
+                NhaSX NhaSX = param.getValue();
+                 return new SimpleObjectProperty<>(QuocGiaBLL.get(NhaSX.getMaQuocGia()));
 
             }
         });
-        nationCol.setMinWidth(200);
+        quocGiaCol.setMinWidth(200);
     }
 
-    public TableView<Producer> getTableView() {
+    public TableView<NhaSX> getTableView() {
 
-        TableView<Producer> tableView = new TableView<>();
+        TableView<NhaSX> tableView = new TableView<>();
 
-        tableView.setItems(ProducerBLL.getAllProducer());
+        tableView.setItems(NhaSXBLL.getAll());
         tableView.setMinHeight(450);
         tableView.setEditable(true);
         tableView.prefHeightProperty().bind(this.heightProperty().divide(5.5 / 4.5));
-        tableView.getColumns().addAll(idCol, nameCol, nationCol);
-        tableView.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Producer>() {
+        tableView.getColumns().addAll(idCol, nameCol, quocGiaCol);
+        tableView.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<NhaSX>() {
             @Override
-            public void changed(ObservableValue<? extends Producer> observable, Producer oldValue, Producer newValue) {
+            public void changed(ObservableValue<? extends NhaSX> observable, NhaSX oldValue, NhaSX newValue) {
                 if(tableView.getSelectionModel().getSelectedItem() != null){
-                    InputField.setProducerFromTable(newValue);
+                    InputField.setNhaSXFromTable(newValue);
                 }
             }
         });
@@ -146,6 +136,41 @@ public class DataTable extends VBox {
         this.setSpacing(20);
         this.getChildren().addAll(tableView, buttonBar);
 
+
+    }
+
+    //====================== Controller ======================
+
+    public void createButton(){
+
+
+        deleteBtn = MyLayout.getButton("Delete", ImageGetter.DELETE, MyLayout.ICON_SIZE);
+        deleteBtn.setOnAction(e -> delete());
+
+        deleteAllBtn = MyLayout.getButton("Delete All", ImageGetter.DELETE, MyLayout.ICON_SIZE);
+        deleteAllBtn.setOnAction(e -> deleteAll());
+
+        refreshBtn = MyLayout.getButton("Refresh", ImageGetter.REFRESH, MyLayout.ICON_SIZE);
+        refreshBtn.setOnAction(e -> tableView.setItems(NhaSXBLL.getAll()));
+
+    }
+
+    public static void delete(){
+
+        ObservableList<NhaSX> list = tableView.getSelectionModel().getSelectedItems();
+        if(list == null)
+            MyDialog.showDialog("Non Selected Item",null, "Select an Item Pls",MyDialog.ERRO);
+        for(NhaSX item : list)
+            NhaSXBLL.delete(item);
+
+    }
+
+    public static void deleteAll(){
+
+        ObservableList<NhaSX> list = tableView.getItems();
+        for(NhaSX item : list)
+            NhaSXBLL.delete(item);
+        MyDialog.showDialog("Delete Success",null, "Done!", MyDialog.INFO);
 
     }
 }

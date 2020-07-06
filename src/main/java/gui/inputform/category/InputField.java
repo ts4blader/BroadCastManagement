@@ -1,10 +1,11 @@
 package gui.inputform.category;
 
 
-import bll.CategoryBLL;
+import bll.TheLoaiBLL;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextField;
-import entities.Category;
+import dto.TheLoai;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.layout.HBox;
@@ -12,6 +13,8 @@ import javafx.scene.layout.VBox;
 import utilities.ImageGetter;
 import utilities.MyDialog;
 import utilities.MyLayout;
+
+import java.util.Formatter;
 
 
 public class InputField extends VBox {
@@ -23,27 +26,28 @@ public class InputField extends VBox {
 
     private static JFXTextField nameField;
 
-    private HBox buttonBar;
+    private static HBox buttonBar;
 
-    private JFXButton addBtn;
-    private JFXButton clearBtn;
-    private JFXButton searchBtn;
+    private static JFXButton addBtn;
+    private static JFXButton clearBtn;
+    private static JFXButton searchBtn;
+    private static JFXButton updateBtn;
 
 
     public InputField() {
 
         idField = MyLayout.getTextField("ID");
-        idField.setOnAction( e -> addCategory());
-        MyLayout.setValidator(idField, "Not match Requirement");
+        idField.setText(setAutoID());
+        idField.setDisable(true);
 
         nameField = MyLayout.getTextField("Name");
-        nameField.setOnAction(e -> addCategory());
+        nameField.setOnAction(e -> save());
         MyLayout.setValidator(nameField, "Not match Requirement");
 
 
         //====================== Button Bar ======================
 
-        buttonBar = getButtonBar();
+        createButtonBar();
 
         //================ main layout =============
 
@@ -62,76 +66,42 @@ public class InputField extends VBox {
 
     }
 
-    public boolean validatorCategory() {
-        if (idField.getText().equals("")){
-            MyDialog.showDialog("Input requirement", null, "ID not match Requirement", MyDialog.ERRO);
-            return false;
-        }
-        if (nameField.getText().equals("")) {
-            MyDialog.showDialog("Input requirement", null, "Name not match Requirement", MyDialog.ERRO);
-            return false;
-        }
-
-        return true;
-    }
-
-    public HBox getButtonBar() {
-
-        HBox hBox;
+    public void createButtonBar() {
 
         addBtn = MyLayout.getJFXButton("Add", ImageGetter.ADD, MyLayout.ICON_SIZE);
-        addBtn.setOnAction( e -> addCategory());
+        addBtn.setOnAction( e -> save());
+
         clearBtn = MyLayout.getJFXButton("Clear", ImageGetter.CLEAR, MyLayout.ICON_SIZE);
         clearBtn.setOnAction( e -> clearInput());
+
         searchBtn = MyLayout.getJFXButton("Search", ImageGetter.SEARCH, MyLayout.ICON_SIZE);
+        searchBtn.setOnAction(e -> search());
 
-
+        updateBtn = MyLayout.getJFXButton("Update", ImageGetter.SAVE, MyLayout.ICON_SIZE);
+        updateBtn.setOnAction(e -> update());
         //add to Button Bar
-        hBox = new HBox(15);
-        hBox.setAlignment(Pos.CENTER);
-        hBox.getChildren().addAll(addBtn, clearBtn, searchBtn);
+        buttonBar = new HBox(10);
+        buttonBar.setAlignment(Pos.CENTER);
+        buttonBar.getChildren().addAll(addBtn, clearBtn, searchBtn, updateBtn);
 
-
-        return hBox;
 
     }
 
-    public boolean addCategory() {
+    public void clearInput() {
         try {
-            if (!validatorCategory()) return false;
-
-            String id = idField.getText().trim();
-            String name = nameField.getText().trim();
-
-            CategoryBLL.addCategory(new Category(id, name));
-            return true;
-
-        } catch (Exception e) {
-            MyDialog.showDialog("Can not Add Program", "Unknow Error", e.getMessage(), MyDialog.ERRO);
-        } finally {
-            return false;
-        }
-
-    }
-
-    public boolean clearInput() {
-        try {
-            idField.setText("");
+            idField.setText(setAutoID());
             nameField.setText("");
 
-            return true;
         } catch (Exception e) {
             MyDialog.showDialog("Clear Input", "Clear Error", e.getMessage(), MyDialog.ERRO);
-        } finally {
-            return false;
         }
     }
 
-    public static boolean setCategoryFromTable(Category category){
+    public static boolean getObjFromTable(TheLoai category){
 
         try {
-            idField.setText(category.getId());
-            nameField.setText(category.getName());
+            idField.setText(category.getMaTheLoai());
+            nameField.setText(category.getTenTheLoai());
 
             return true;
         } catch (Exception e){
@@ -140,5 +110,58 @@ public class InputField extends VBox {
 
         return false;
     }
-    //====================== End =================================
+
+    public static TheLoai getObjFormField(){
+
+        String id = idField.getText().trim();
+        String name = nameField.getText().trim();
+
+        return new TheLoai(id, name);
+
+    }
+
+    public static void setAction(){
+
+
+
+    }
+
+    //====================== Controller ======================
+
+    public static String setAutoID(){
+
+        int rows = TheLoaiBLL.getRowNumber();
+        rows++;
+        if(rows/10 > 1 && rows/10 < 10) return "tl0" + String.valueOf(rows);
+        else if(rows/10 < 1) return "tl00" + String.valueOf(rows);
+            else return "tl" + String.valueOf(rows);
+
+    }
+
+    public static boolean validator() {
+
+        if (nameField.getText().equals("")) {
+            MyDialog.showDialog("Input requirement", null, "Name not Null", MyDialog.ERRO);
+            return false;
+        }
+
+        return true;
+    }
+
+    public static void save() {
+
+        if(!validator()) return;
+        TheLoaiBLL.save(getObjFormField());
+        idField.setFocusTraversable(true);
+
+    }
+
+    public static ObservableList<TheLoai> search(){
+        return TheLoaiBLL.get(getObjFormField());
+    }
+
+    public static void update(){
+        TheLoaiBLL.update(getObjFormField());
+        MyDialog.showDialog("Update",null,"Update Success",MyDialog.INFO);
+    }
 }

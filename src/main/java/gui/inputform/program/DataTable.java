@@ -1,77 +1,69 @@
 package gui.inputform.program;
 
-import bll.CategoryBLL;
-import bll.NationBLL;
-import bll.ProducerBLL;
-import bll.ProgramBLL;
-import entities.Category;
-import entities.Nation;
-import entities.Producer;
-import entities.Program;
+import bll.QuocGiaBLL;
+import bll.TheLoaiBLL;
+import bll.NhaSXBLL;
+import bll.ChuongTrinhBLL;
+import dto.ChuongTrinh;
+import dto.NhaSX;
+import dto.QuocGia;
+import dto.TheLoai;
 import javafx.beans.value.ChangeListener;
+import javafx.collections.ObservableList;
 import utilities.ImageGetter;
+import utilities.MyDialog;
 import utilities.MyLayout;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.util.Callback;
-
-import java.io.File;
 
 public class DataTable extends VBox {
 
     public final static int ICON_SIZE = 15;
 
     //TableView
-    private TableView<Program> tableView;
+    private static TableView<ChuongTrinh> tableView;
     //ID Col
-    private TableColumn<Program, String> idCol;
+    private static TableColumn<ChuongTrinh, String> idCol;
     //Name Col
-    private TableColumn<Program, String> nameCol;
-    //Category Col
-    private TableColumn<Program, Category> categoryCol;
-    //Producer Col
-    private TableColumn<Program, Producer> producerCol;
-    //Nation Col
-    private TableColumn<Program, Nation> nationCol;
+    private static TableColumn<ChuongTrinh, String> nameCol;
+    //TheLoail
+    private static TableColumn<ChuongTrinh, TheLoai> theLoaiCol;
+    //NhaSX Col
+    private static TableColumn<ChuongTrinh, NhaSX> nhaSXCol;
+    //QuocGia Col
+    private static TableColumn<ChuongTrinh, QuocGia> quocGiaCol;
     //Button Bar
-    private HBox buttonBar;
+    private static HBox buttonBar;
     //Buttons
-    private Button saveBtn;
-    private Button undoBtn;
-    private Button redoBtn;
-    private Button deleteBtn;
-    private Button deleteAllBtn;
+    private static Button deleteBtn;
+    private static Button deleteAllBtn;
+    private static Button refreshBtn;
 
 
     public DataTable() {
 
         //====================== ID Col ======================
 
-        idCol = getTextCol("#", "id");
+        idCol = getTextCol("#", "maCT");
         idCol.setStyle("-fx-alignment: CENTER-RIGHT");
 
         //====================== Name Col ======================
 
-        nameCol = getTextCol("Name", "name");
+        nameCol = getTextCol("Name", "tenCT");
 
-        //====================== Category Col ======================
+        //====================== Nha SX Col ======================
 
-        categoryCol = getCategoryCol();
+        nhaSXCol = getNhaSXCol();
 
-        //====================== Producer Col ======================
+        //====================== The Loai Col ======================
 
-        producerCol = getProducerCol();
-
-        //====================== Nation Col ======================
-
-        nationCol = getNationCol();
+        theLoaiCol = getTheLoaiCol();
 
         //====================== Button Bar ======================
 
@@ -87,58 +79,53 @@ public class DataTable extends VBox {
 
     }
 
-    public TableColumn<Program, String> getTextCol(String text, String property) {
+    public TableColumn<ChuongTrinh, String> getTextCol(String text, String property) {
 
-        TableColumn<Program, String> tableColumn;
+        TableColumn<ChuongTrinh, String> tableColumn;
         tableColumn = new TableColumn<>(text);
 
         tableColumn.setCellValueFactory(new PropertyValueFactory<>(property));
         tableColumn.setMinWidth(50);
 
         //Commit
-//        tableColumn.setOnEditCommit((TableColumn.CellEditEvent<Program, String> e) -> {
-//            TablePosition<Program, String> pos = e.getTablePosition();
+//        tableColumn.setOnEditCommit((TableColumn.CellEditEvent<ChuongTrinh, String> e) -> {
+//            TablePosition<ChuongTrinh, String> pos = e.getTablePosition();
 //
 //            String newValue = e.getNewValue();
 //
 //            int row = pos.getRow();
-//            Program program = e.getTableView().getItems().get(row);
+//            ChuongTrinh ChuongTrinh = e.getTableView().getItems().get(row);
 //
-//            ProgramBLL.update(program);
+//            ChuongTrinhBLL.update(ChuongTrinh);
 //        });
 
         return tableColumn;
     }
 
-    public TableColumn<Program, Category> getCategoryCol() {
+    public TableColumn<ChuongTrinh, TheLoai> getTheLoaiCol() {
 
-        TableColumn<Program, Category> tableColumn;
-        tableColumn = new TableColumn<>("Category");
+        TableColumn<ChuongTrinh, TheLoai> tableColumn;
+        tableColumn = new TableColumn<>("The Loai");
 
-        tableColumn.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Program, Category>, ObservableValue<Category>>() {
+        tableColumn.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<ChuongTrinh, TheLoai>, ObservableValue<TheLoai>>() {
             @Override
-            public ObservableValue<Category> call(TableColumn.CellDataFeatures<Program, Category> param) {
-                Program program = param.getValue();
-
-                String categoryID = program.getCategoryID();
-                Category category = CategoryBLL.getCategoryByID(categoryID);
-
-
-                return new SimpleObjectProperty<Category>(category);
+            public ObservableValue<TheLoai> call(TableColumn.CellDataFeatures<ChuongTrinh, TheLoai> param) {
+                ChuongTrinh chuongTrinh = param.getValue();
+                return new SimpleObjectProperty<>(TheLoaiBLL.get(chuongTrinh.getMaTheLoai()));
             }
         });
         //set cell factory
-//        tableColumn.setCellFactory(ComboBoxTableCell.forTableColumn(CategoryBLL.getAllCategory()));
+//        tableColumn.setCellFactory(ComboBoxTableCell.forTableColumn(TheLoai.getAllTheLoai);
         //Commit
-//        tableColumn.setOnEditCommit((TableColumn.CellEditEvent<Program, Category> e) -> {
-//            TablePosition<Program, Category> pos = e.getTablePosition();
+//        tableColumn.setOnEditCommit((TableColumn.CellEditEvent<ChuongTrinh, TheLoai) -> {
+//            TablePosition<ChuongTrinh, TheLoaios = e.getTablePosition();
 //            //get new value
-//            Category newCategory = e.getNewValue();
+//            TheLoaiwTheLoaie.getNewValue();
 //            //get row
 //            int row = pos.getRow();
-//            Program program = e.getTableView().getItems().get(row);
+//            ChuongTrinh ChuongTrinh = e.getTableView().getItems().get(row);
 //
-//            ProgramBLL.update(program);
+//            ChuongTrinhBLL.update(ChuongTrinh);
 //        });
 
         tableColumn.setMinWidth(100);
@@ -148,32 +135,32 @@ public class DataTable extends VBox {
 
     }
 
-    public TableColumn<Program, Producer> getProducerCol() {
+    public TableColumn<ChuongTrinh, NhaSX> getNhaSXCol() {
 
-        TableColumn<Program, Producer> tableColumn;
-        tableColumn = new TableColumn<>("Producer");
+        TableColumn<ChuongTrinh, NhaSX> tableColumn;
+        tableColumn = new TableColumn<>("NhaSX");
 
-        tableColumn.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Program, Producer>, ObservableValue<Producer>>() {
+        tableColumn.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<ChuongTrinh, NhaSX>, ObservableValue<NhaSX>>() {
             @Override
-            public ObservableValue<Producer> call(TableColumn.CellDataFeatures<Program, Producer> param) {
-                Program program = param.getValue();
+            public ObservableValue<NhaSX> call(TableColumn.CellDataFeatures<ChuongTrinh, NhaSX> param) {
+                ChuongTrinh ChuongTrinh = param.getValue();
 
-                Producer producer = ProducerBLL.getProducerById(program.getProducerID());
+                NhaSX nhaSX = NhaSXBLL.get(ChuongTrinh.getMaNSX());
 
-                return new SimpleObjectProperty<Producer>(producer);
+                return new SimpleObjectProperty<NhaSX>(nhaSX);
             }
         });
 
-//        tableColumn.setCellFactory(ComboBoxTableCell.forTableColumn(ProducerBLL.getAllProducer()));
+//        tableColumn.setCellFactory(ComboBoxTableCell.forTableColumn(NhaSXBLL.getAllNhaSX()));
 
-//        tableColumn.setOnEditCommit((TableColumn.CellEditEvent<Program, Producer> e) -> {
-//            TablePosition<Program, Producer> position = e.getTablePosition();
+//        tableColumn.setOnEditCommit((TableColumn.CellEditEvent<ChuongTrinh, NhaSX> e) -> {
+//            TablePosition<ChuongTrinh, NhaSX> position = e.getTablePosition();
 //
 //            int row = position.getRow();
 //
-//            Program program = e.getTableView().getItems().get(row);
+//            ChuongTrinh ChuongTrinh = e.getTableView().getItems().get(row);
 //
-//            //update Producer
+//            //update NhaSX
 //        });
 
         tableColumn.setMinWidth(100);
@@ -181,67 +168,35 @@ public class DataTable extends VBox {
         return tableColumn;
 
 
-    }
-
-    public TableColumn<Program, Nation> getNationCol(){
-
-        TableColumn<Program, Nation> tableColumn = new TableColumn<>("Nation");
-        tableColumn.setCellValueFactory( cellData -> {
-            Producer producer = ProducerBLL.getProducerById(cellData.getValue().getProducerID());
-
-            return producer.getNationProperty();
-        });
-
-        tableColumn.setCellFactory( column -> {
-            return new TableCell<Program, Nation>(){
-                @Override
-                protected void updateItem(Nation item, boolean empty) {
-                    if(item == null || empty)
-                        setText("");
-                    else
-                        setText(item.getName());
-                }
-            };
-        });
-
-        return tableColumn;
     }
 
     public HBox getButtonBar() {
 
         HBox hBox = new HBox(MyLayout.SPACE);
 
-        saveBtn = MyLayout.getButton("Save", ImageGetter.SAVE, MyLayout.ICON_SIZE);
-
-        redoBtn = MyLayout.getButton("Redo", ImageGetter.REDO, MyLayout.ICON_SIZE);
-
-        undoBtn = MyLayout.getButton("Undo", ImageGetter.UNDO, MyLayout.ICON_SIZE);
-
-        deleteBtn = MyLayout.getButton("Delete", ImageGetter.DELETE, MyLayout.ICON_SIZE);
-
-        deleteAllBtn = MyLayout.getButton("Delete All", ImageGetter.DELETE, MyLayout.ICON_SIZE);
+        createButton();
 
         hBox.setAlignment(Pos.CENTER);
-        hBox.getChildren().addAll(saveBtn, undoBtn, redoBtn, deleteBtn, deleteAllBtn);
+        hBox.getChildren().addAll(refreshBtn, deleteBtn, deleteAllBtn);
 
         return hBox;
 
     }
 
-    public TableView<Program> getTableView() {
+    public TableView<ChuongTrinh> getTableView() {
 
-        TableView<Program> tableView = new TableView<>();
+        TableView<ChuongTrinh> tableView = new TableView<>();
 
-        tableView.setItems(ProgramBLL.getAllProgram());
+        tableView.setItems(ChuongTrinhBLL.getAll());
         tableView.setMinHeight(450);
         tableView.setEditable(true);
         tableView.prefHeightProperty().bind(this.heightProperty().divide(5.5 / 4.5));
-        tableView.getColumns().addAll(idCol, nameCol, categoryCol, producerCol, nationCol);
-        tableView.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Program>() {
+        tableView.getColumns().addAll(idCol, nameCol, theLoaiCol, nhaSXCol);
+        tableView.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<ChuongTrinh>() {
             @Override
-            public void changed(ObservableValue<? extends Program> observable, Program oldValue, Program newValue) {
+            public void changed(ObservableValue<? extends ChuongTrinh> observable, ChuongTrinh oldValue, ChuongTrinh newValue) {
                 if(tableView.getSelectionModel().getSelectedItem() != null){
-                    InputField.setProgramFromTable(newValue);
+                    InputField.setObjFromField(newValue);
                 }
             }
         });
@@ -255,6 +210,41 @@ public class DataTable extends VBox {
         this.setSpacing(20);
         this.getChildren().addAll(tableView, buttonBar);
 
+
+    }
+
+    //====================== Controller ======================
+
+    public void createButton(){
+
+
+        deleteBtn = MyLayout.getButton("Delete", ImageGetter.DELETE, MyLayout.ICON_SIZE);
+        deleteBtn.setOnAction(e -> delete());
+
+        deleteAllBtn = MyLayout.getButton("Delete All", ImageGetter.DELETE, MyLayout.ICON_SIZE);
+        deleteAllBtn.setOnAction(e -> deleteAll());
+
+        refreshBtn = MyLayout.getButton("Refresh", ImageGetter.REFRESH, MyLayout.ICON_SIZE);
+        refreshBtn.setOnAction(e -> tableView.setItems(ChuongTrinhBLL.getAll()));
+
+    }
+
+    public static void delete(){
+
+        ObservableList<ChuongTrinh> list = tableView.getSelectionModel().getSelectedItems();
+        if(list == null)
+            MyDialog.showDialog("Non Selected Item",null, "Select an Item Pls",MyDialog.ERRO);
+        for(ChuongTrinh item : list)
+            ChuongTrinhBLL.delete(item);
+
+    }
+
+    public static void deleteAll(){
+
+        ObservableList<ChuongTrinh> list = tableView.getItems();
+        for(ChuongTrinh item : list)
+            ChuongTrinhBLL.delete(item);
+        MyDialog.showDialog("Delete Success",null, "Done!", MyDialog.INFO);
 
     }
 }

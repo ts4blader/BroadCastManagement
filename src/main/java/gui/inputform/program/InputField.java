@@ -1,28 +1,23 @@
 package gui.inputform.program;
 
-import bll.CategoryBLL;
-import bll.ChannelBLL;
-import bll.ProducerBLL;
-import bll.ProgramBLL;
-import entities.Category;
-import entities.Channel;
-import entities.Producer;
-import entities.Program;
-import javafx.scene.control.SingleSelectionModel;
+import bll.TheLoaiBLL;
+import bll.KenhTVBLL;
+import bll.NhaSXBLL;
+import bll.ChuongTrinhBLL;
+import dto.ChuongTrinh;
+import dto.KenhTV;
+import dto.NhaSX;
+import dto.TheLoai;
+import javafx.collections.ObservableList;
 import utilities.ImageGetter;
 import utilities.MyDialog;
 import utilities.MyLayout;
 import com.jfoenix.controls.*;
-import com.jfoenix.validation.RequiredFieldValidator;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Font;
-
-import java.io.File;
 
 public class InputField extends VBox {
     // Define const
@@ -33,45 +28,51 @@ public class InputField extends VBox {
 
     private static JFXTextField nameField;
 
-    private HBox channelField;
-    private static JFXComboBox<Channel> channelSelector;
-    private static JFXTextField channelName;
+    private static HBox kenhTVField;
+    private static JFXComboBox<KenhTV> kenhTVSelector;
+    private static JFXTextField kenhTVName;
 
-    private HBox categoryField;
-    private static JFXComboBox<Category> categorySelector;
-    private static JFXTextField categoryName;
+    private static HBox theLoaiField;
+    private static JFXComboBox<TheLoai> theLoaiSelector;
+    private static JFXTextField theLoaiName;
 
-    private HBox producerField;
-    private static JFXComboBox<Producer> producerSelector;
-    private static JFXTextField producerName;
+    private static HBox nhaSXField;
+    private static JFXComboBox<NhaSX> nhaSXSelector;
+    private static JFXTextField nhaSXName;
 
-    private HBox buttonBar;
+    private static HBox buttonBar;
 
-    private JFXButton addBtn;
-    private JFXButton clearBtn;
-    private JFXButton searchBtn;
+    private static JFXButton addBtn;
+    private static JFXButton clearBtn;
+    private static JFXButton searchBtn;
+    private static JFXButton updateBtn;
 
 
     public InputField() throws Exception {
 
         idField = MyLayout.getTextField("ID");
-        MyLayout.setValidator(idField, "Not match Requirement");
+        idField.setDisable(true);
+        idField.setText(setAutoID());
 
         nameField = MyLayout.getTextField("Name");
         MyLayout.setValidator(nameField, "Not match Requirement");
 
 
-        //====================== Channel Field ======================
+        //====================== KenhTV Field ======================
 
-        channelField = getChannelField();
+        kenhTVField = getKenhTVField();
 
-        //================= Category Field ===================
+        //================= TheLoai Field ===================
 
-        categoryField = getCategoryField();
+        theLoaiField = getTheLoaiField();
 
-        //============== Producer Field ==================
+        //============== NhaSX Field ==================
 
-        producerField = getProducerField();
+        nhaSXField = getNhaSXField();
+
+        //====================== Set All Action ======================
+
+        setAction();
 
         //====================== Button Bar ======================
 
@@ -90,56 +91,56 @@ public class InputField extends VBox {
         this.setPadding(new Insets(30));
         this.setSpacing(40);
         this.setAlignment(Pos.CENTER);
-        this.getChildren().addAll(idField, nameField, channelField, categoryField, producerField, buttonBar);
+        this.getChildren().addAll(idField, nameField, theLoaiField, nhaSXField, buttonBar);
 
     }
 
-    public HBox getChannelField() {
+    public HBox getKenhTVField() {
 
         HBox hBox;
 
-        channelSelector = getChannelSelector();
-        channelSelector.setPrefHeight(MyLayout.INPUT_HEIGHT);
-        channelName = MyLayout.getSubTextField("Channel ID");
-        channelName.prefWidthProperty().bind(this.widthProperty().multiply(MyLayout.NAME_FIELD));
-        channelName.setDisable(true);
+        kenhTVSelector = getKenhTVSelector();
+        kenhTVSelector.setPrefHeight(MyLayout.INPUT_HEIGHT);
+        kenhTVName = MyLayout.getSubTextField("KenhTV ID");
+        kenhTVName.prefWidthProperty().bind(this.widthProperty().multiply(MyLayout.NAME_FIELD));
+        kenhTVName.setDisable(true);
 
         hBox = new HBox(10);
-        hBox.getChildren().addAll(channelSelector, channelName);
+        hBox.getChildren().addAll(kenhTVSelector, kenhTVName);
 
         return hBox;
     }
 
-    public HBox getCategoryField() {
+    public HBox getTheLoaiField() {
 
         HBox hBox;
 
-        categorySelector = getCategorySelector();
-        categorySelector.setPrefHeight(MyLayout.INPUT_HEIGHT);
+        theLoaiSelector = getTheLoaiSelector();
+        theLoaiSelector.setPrefHeight(MyLayout.INPUT_HEIGHT);
 
-        categoryName = MyLayout.getSubTextField("Category ID");
-        categoryName.setDisable(true);
-        categoryName.prefWidthProperty().bind(this.widthProperty().multiply(MyLayout.NAME_FIELD));
+        theLoaiName = MyLayout.getSubTextField("TheLoai ID");
+        theLoaiName.setDisable(true);
+        theLoaiName.prefWidthProperty().bind(this.widthProperty().multiply(MyLayout.NAME_FIELD));
 
         hBox = new HBox(15);
-        hBox.getChildren().addAll(categorySelector, categoryName);
+        hBox.getChildren().addAll(theLoaiSelector, theLoaiName);
 
         return hBox;
     }
 
-    public HBox getProducerField() {
+    public HBox getNhaSXField() {
 
         HBox hBox;
 
-        producerSelector = getProducerSelector();
-        producerSelector.setPrefHeight(MyLayout.INPUT_HEIGHT);
+        nhaSXSelector = getNhaSXSelector();
+        nhaSXSelector.setPrefHeight(MyLayout.INPUT_HEIGHT);
 
-        producerName = MyLayout.getSubTextField("Producer ID");
-        producerName.setDisable(true);
-        producerName.prefWidthProperty().bind(this.widthProperty().multiply(MyLayout.NAME_FIELD));
+        nhaSXName = MyLayout.getSubTextField("NhaSX ID");
+        nhaSXName.setDisable(true);
+        nhaSXName.prefWidthProperty().bind(this.widthProperty().multiply(MyLayout.NAME_FIELD));
 
         hBox = new HBox(15);
-        hBox.getChildren().addAll(producerSelector, producerName);
+        hBox.getChildren().addAll(nhaSXSelector, nhaSXName);
 
         return hBox;
 
@@ -150,130 +151,91 @@ public class InputField extends VBox {
         HBox hBox;
 
         addBtn = MyLayout.getJFXButton("Add", ImageGetter.ADD, MyLayout.ICON_SIZE);
-        addBtn.setOnAction(e -> addProgram());
+        addBtn.setOnAction(e -> save());
 
         clearBtn = MyLayout.getJFXButton("Clear", ImageGetter.CLEAR, MyLayout.ICON_SIZE);
         clearBtn.setOnAction(e -> clearInput());
 
         searchBtn = MyLayout.getJFXButton("Search", ImageGetter.SEARCH, MyLayout.ICON_SIZE);
+        searchBtn.setOnAction(e -> search());
 
+        updateBtn = MyLayout.getJFXButton("Update", ImageGetter.SAVE, MyLayout.ICON_SIZE);
+        updateBtn.setOnAction(e -> update());
 
         //add to Button Bar
-        hBox = new HBox(15);
+        hBox = new HBox(10);
         hBox.setAlignment(Pos.CENTER);
-        hBox.getChildren().addAll(addBtn, clearBtn, searchBtn);
+        hBox.getChildren().addAll(addBtn, clearBtn, searchBtn, updateBtn);
 
 
         return hBox;
 
     }
 
-    public JFXComboBox<Channel> getChannelSelector() {
+    public JFXComboBox<KenhTV> getKenhTVSelector() {
 
-        JFXComboBox<Channel> comboBox;
+        JFXComboBox<KenhTV> comboBox;
 
         comboBox = new JFXComboBox<>();
-        comboBox.setPromptText("Channel");
+        comboBox.setPromptText("KenhTV");
         comboBox.setLabelFloat(true);
         comboBox.prefWidthProperty().bind(this.widthProperty().multiply(MyLayout.SELECTOR_FIELD));
-        comboBox.setItems(ChannelBLL.getAllChannel());
+        comboBox.setItems(KenhTVBLL.getAll());
 
-        comboBox.setOnAction(e -> channelName.setText(comboBox.getValue().getId()));
+        comboBox.setOnAction(e -> kenhTVName.setText(comboBox.getValue().getMaKenh()));
         comboBox.setOnKeyPressed(e -> {
             if (e.getCode() == KeyCode.ENTER)
-                addProgram();
+                save();
         });
 
         return comboBox;
     }
 
-    public JFXComboBox<Category> getCategorySelector() {
+    public JFXComboBox<TheLoai> getTheLoaiSelector() {
 
-        JFXComboBox<Category> comboBox;
+        JFXComboBox<TheLoai> comboBox;
 
         comboBox = new JFXComboBox<>();
-        comboBox.setPromptText("Category");
+        comboBox.setPromptText("TheLoai");
         comboBox.setLabelFloat(true);
         comboBox.prefWidthProperty().bind(this.widthProperty().multiply(MyLayout.SELECTOR_FIELD));
-        comboBox.setItems(CategoryBLL.getAllCategory());
+        comboBox.setItems(TheLoaiBLL.getAll());
 
-        comboBox.setOnAction(e -> categoryName.setText(comboBox.getValue().getId()));
+        comboBox.setOnAction(e -> theLoaiName.setText(comboBox.getValue().getMaTheLoai()));
         comboBox.setOnKeyPressed(e -> {
             if (e.getCode() == KeyCode.ENTER)
-                addProgram();
+                save();
         });
 
         return comboBox;
     }
 
-    public JFXComboBox<Producer> getProducerSelector() {
+    public JFXComboBox<NhaSX> getNhaSXSelector() {
 
-        JFXComboBox<Producer> comboBox;
+        JFXComboBox<NhaSX> comboBox;
 
         comboBox = new JFXComboBox<>();
-        comboBox.setPromptText("Producer");
+        comboBox.setPromptText("NhaSX");
         comboBox.setLabelFloat(true);
         comboBox.prefWidthProperty().bind(this.widthProperty().multiply(MyLayout.SELECTOR_FIELD));
-        comboBox.setItems(ProducerBLL.getAllProducer());
+        comboBox.setItems(NhaSXBLL.getAll());
 
-        comboBox.setOnAction(e -> producerName.setText(comboBox.getValue().getId()));
+        comboBox.setOnAction(e -> nhaSXName.setText(comboBox.getValue().getMaNSX()));
         comboBox.setOnKeyPressed(e -> {
             if (e.getCode() == KeyCode.ENTER)
-                addProgram();
+                save();
         });
 
         return comboBox;
-    }
-
-    public boolean validatorProgram() {
-        if (nameField.getText().equals("")) {
-            MyDialog.showDialog("Input requirement", null, "Name not match Requirement", MyDialog.ERRO);
-            return false;
-        }
-        if (channelSelector.getValue() == null) {
-            MyDialog.showDialog("Input requirement", null, "Channel not null", MyDialog.ERRO);
-            return false;
-        }
-        if (categorySelector.getValue() == null) {
-            MyDialog.showDialog("Input requirement", null, "Category not null", MyDialog.ERRO);
-            return false;
-        }
-        if (producerSelector.getValue() == null) {
-            MyDialog.showDialog("Input requirement", null, "Producer not null", MyDialog.ERRO);
-            return false;
-        }
-
-        return true;
-    }
-
-    public boolean addProgram() {
-        try {
-            if (!validatorProgram()) return false;
-
-            String id = idField.getText().trim();
-            String name = nameField.getText().trim();
-            String categoryID = categorySelector.getValue().getId();
-            String channelID = channelSelector.getValue().getId();
-            String producerID = producerSelector.getValue().getId();
-
-            ProgramBLL.add(new Program(id, name, categoryID, producerID));
-            return true;
-
-        } catch (Exception e) {
-            MyDialog.showDialog("Can not Add Program", "Unknow Error", e.getMessage(), MyDialog.ERRO);
-        } finally {
-            return false;
-        }
-
     }
 
     public boolean clearInput() {
         try {
-            idField.setText("");
+            idField.setText(setAutoID());
             nameField.setText("");
-            channelSelector.setValue(new Channel());
-            categorySelector.setValue(new Category());
-            producerSelector.setValue(new Producer());
+            kenhTVSelector.setValue(new KenhTV());
+            theLoaiSelector.setValue(new TheLoai());
+            nhaSXSelector.setValue(new NhaSX());
 
             return true;
         } catch (Exception e) {
@@ -283,13 +245,13 @@ public class InputField extends VBox {
         }
     }
 
-    public static boolean setProgramFromTable(Program program){
+    public static boolean setObjFromField(ChuongTrinh program){
 
         try {
-            idField.setText(program.getId());
-            nameField.setText(program.getName());
-            categorySelector.setValue(CategoryBLL.getCategoryByID(program.getCategoryID()));
-            producerSelector.setValue(ProducerBLL.getProducerById(program.getProducerID()));
+            idField.setText(program.getMaCT());
+            nameField.setText(program.getTenCT());
+            theLoaiSelector.setValue(TheLoaiBLL.get(program.getMaTheLoai()));
+            nhaSXSelector.setValue(NhaSXBLL.get(program.getMaNSX()));
 
             return true;
         } catch (Exception e){
@@ -297,6 +259,78 @@ public class InputField extends VBox {
         }
         return false;
 
+    }
+
+    public static ChuongTrinh getObjFormField(){
+
+        String id = idField.getText().trim();
+        String name = nameField.getText().trim();
+        String categoryID, nhaSXID;
+
+        if(theLoaiSelector.getValue() == null) categoryID = "";
+        else categoryID = theLoaiSelector.getValue().getMaTheLoai();
+
+        if(nhaSXSelector.getValue() == null) nhaSXID = "";
+        else nhaSXID = nhaSXSelector.getValue().getMaNSX();
+
+
+        return new ChuongTrinh(id, name, categoryID, nhaSXID);
+
+    }
+
+    public void setAction(){
+
+        nameField.setOnKeyPressed(e -> {
+            if(e.getCode() == KeyCode.ENTER)
+                save();
+        });
+        theLoaiSelector.setOnKeyPressed(e -> {
+            if(e.getCode() == KeyCode.ENTER)
+                save();
+        });
+        nhaSXSelector.setOnKeyPressed(e -> {
+            if(e.getCode() == KeyCode.ENTER)
+                save();
+        });
+
+    }
+    //====================== Controller ======================
+
+    public static String setAutoID(){
+
+        int rows = ChuongTrinhBLL.getRowNumber();
+        rows++;
+        if(rows/10 > 1 && rows/10 < 10) return "ct0" + String.valueOf(rows);
+        else if(rows/10 < 1) return "ct00" + String.valueOf(rows);
+        else return "ct" + String.valueOf(rows);
+
+    }
+
+    public static boolean validator() {
+
+        if (nameField.getText().equals("")) {
+            MyDialog.showDialog("Input requirement", null, "Name not Null", MyDialog.ERRO);
+            return false;
+        }
+
+        return true;
+    }
+
+    public static void save() {
+
+        if(!validator()) return;
+        ChuongTrinhBLL.save(getObjFormField());
+        idField.setFocusTraversable(true);
+
+    }
+
+    public static ObservableList<ChuongTrinh> search(){
+        return ChuongTrinhBLL.get(getObjFormField());
+    }
+
+    public static void update(){
+        ChuongTrinhBLL.update(getObjFormField());
+        MyDialog.showDialog("Update",null,"Update Success",MyDialog.INFO);
     }
 
 }
