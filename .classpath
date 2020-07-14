@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="src" path="src/main/java"/>
+	<classpathentry kind="src" path="src/main/resources"/>
+	<classpathentry kind="src" path="src/test/java"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Maven: com.jfoenix:jfoenix:8.0.8"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Maven: de.jensd:fontawesomefx:8.9"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Maven: mysql:mysql-connector-java:5.1.49"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Maven: org.controlsfx:controlsfx:8.40.14"/>
+	<classpathentry kind="output" path="target/classes"/>
+</classpath>
